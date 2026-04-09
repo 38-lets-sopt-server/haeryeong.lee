@@ -5,9 +5,9 @@ import java.util.List;
 import org.sopt.domain.Post;
 import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.response.CreatePostResponse;
-import org.sopt.dto.response.DeletePostResponse;
 import org.sopt.dto.response.PostResponse;
 import org.sopt.global.exception.PostNotFoundException;
+import org.sopt.global.validator.PostValidator;
 import org.sopt.repository.PostRepository;
 
 public class PostService {
@@ -15,12 +15,9 @@ public class PostService {
 
   // CREATE
   public CreatePostResponse createPost(CreatePostRequest request) {
-    if (request.title == null || request.title.isBlank()) {
-      throw new IllegalArgumentException("제목은 필수입니다!");
-    }
-    if (request.content == null || request.content.isBlank()) {
-      throw new IllegalArgumentException("내용은 필수입니다!");
-    }
+    PostValidator.validatePostTitle(request.title);
+    PostValidator.validatePostContent(request.content);
+
     String createdAt = java.time.LocalDateTime.now().toString();
     Post post = new Post(postRepository.generateId(), request.title, request.content, request.author, createdAt);
     postRepository.save(post);
@@ -35,9 +32,7 @@ public class PostService {
 
   // READ - 단건 📝 과제
   public PostResponse getPost(Long id) {
-    if (id == null || id <= 0) {
-      throw new IllegalArgumentException("유효한 ID를 입력해주세요");
-    }
+    PostValidator.validatePostId(id);
 
     Post post = postRepository.findById(id);
 
@@ -50,12 +45,8 @@ public class PostService {
 
   // UPDATE 📝 과제
   public void updatePost(Long id, String newTitle, String newContent) {
-    if (id == null || id <= 0) {
-      throw new IllegalArgumentException("유효한 ID를 입력해주세요");
-    }
-    if (newTitle == null || newTitle.isBlank()) {
-      throw new IllegalArgumentException("제목은 필수입니다!");
-    }
+    PostValidator.validatePostId(id);
+    PostValidator.validatePostTitle(newTitle);
 
     Post post = postRepository.findById(id);
 
@@ -69,9 +60,7 @@ public class PostService {
 
   // DELETE 📝 과제
   public void deletePost(Long id) {
-    if (id == null || id <= 0) {
-      throw new IllegalArgumentException("유효한 ID를 입력해주세요");
-    }
+    PostValidator.validatePostId(id);
 
     Post post = postRepository.findById(id);
 
