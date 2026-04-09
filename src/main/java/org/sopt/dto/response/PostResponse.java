@@ -16,4 +16,15 @@ public class PostResponse {
     this.author = post.getAuthor();
     this.createdAt = post.getCreatedAt();
   }
+
+  @Override
+  public String toString() {
+    return "PostResponse{" +
+            "id=" + id +
+            ", title='" + title + '\'' +
+            ", content='" + content + '\'' +
+            ", author='" + author + '\'' +
+            ", createdAt='" + createdAt + '\'' +
+            '}';
+  }
 }
