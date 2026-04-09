@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Scanner;
 import org.sopt.controller.PostController;
 import org.sopt.dto.request.CreatePostRequest;
+import org.sopt.dto.request.ReadPostRequest;
 import org.sopt.dto.response.CreatePostResponse;
 import org.sopt.dto.response.PostResponse;
 
@@ -53,7 +54,11 @@ public class Main {
 
         case 3:
           System.out.print("조회할 게시글 ID: ");
-          PostResponse post = postController.getPost(scanner.nextLong());
+          Long id = scanner.nextLong();
+
+          PostResponse post = postController.getPost(
+              new ReadPostRequest(id)
+          );
           scanner.nextLine();
           if (post != null) System.out.println(post);
           break;

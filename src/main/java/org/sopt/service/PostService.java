@@ -32,8 +32,17 @@ public class PostService {
 
   // READ - 단건 📝 과제
   public PostResponse getPost(Long id) {
-    // TODO
-    return null;
+    if (id == null || id <= 0) {
+      throw new IllegalArgumentException("유효한 ID를 입력해주세요");
+    }
+
+    Post post = postRepository.findById(id);
+
+    if (post == null) {
+      throw new IllegalArgumentException("게시글을 찾을 수 없습니다");
+    }
+
+    return new PostResponse(post);
   }
 
   // UPDATE 📝 과제
