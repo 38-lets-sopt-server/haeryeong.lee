@@ -2,7 +2,6 @@ package org.sopt.controller;
 
 import java.util.List;
 import org.sopt.dto.request.CreatePostRequest;
-import org.sopt.dto.request.ReadPostRequest;
 import org.sopt.dto.response.CreatePostResponse;
 import org.sopt.dto.response.PostResponse;
 import org.sopt.service.PostService;
@@ -29,9 +28,9 @@ public class PostController {
   }
 
   // GET /posts/{id} 📝 과제
-  public PostResponse getPost(ReadPostRequest request) {
+  public PostResponse getPost(Long id) {
     try {
-      return postService.getPost(request.id);
+      return postService.getPost(id);
     } catch (IllegalArgumentException e) {
       return null;
     }
