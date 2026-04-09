@@ -2,57 +2,66 @@ package org.sopt.controller;
 
 import java.util.List;
 import org.sopt.dto.request.CreatePostRequest;
+import org.sopt.dto.response.ApiResponse;
 import org.sopt.dto.response.CreatePostResponse;
 import org.sopt.dto.response.PostResponse;
+import org.sopt.global.code.status.ErrorStatus;
+import org.sopt.global.code.status.SuccessStatus;
+import org.sopt.global.exception.PostNotFoundException;
 import org.sopt.service.PostService;
 
 public class PostController {
   private final PostService postService = new PostService();
 
   // POST /posts
-  public CreatePostResponse createPost(CreatePostRequest request) {
+  public ApiResponse<CreatePostResponse> createPost(CreatePostRequest request) {
     try {
-      return postService.createPost(request);
+      CreatePostResponse response = postService.createPost(request);
+      return ApiResponse.of(SuccessStatus.POST_CREATED, response);
     } catch (IllegalArgumentException e) {
-      return new CreatePostResponse(null, "🚫 " + e.getMessage());
+      return ApiResponse.onFailure(ErrorStatus._BAD_REQUEST, null);
     }
   }
 
   // GET /posts 📝 과제
-  public List<PostResponse> getAllPosts() {
-    try {
-      return postService.getAllPosts();
-    } catch (IllegalArgumentException e) {
-      return null;
-    }
+  public ApiResponse<List<PostResponse>> getAllPosts() {
+    List<PostResponse> posts = postService.getAllPosts();
+    return ApiResponse.of(SuccessStatus.POSTS_FOUND, posts);
   }
 
   // GET /posts/{id} 📝 과제
-  public PostResponse getPost(Long id) {
+  public ApiResponse<PostResponse> getPost(Long id) {
     try {
-      return postService.getPost(id);
+      PostResponse post = postService.getPost(id);
+      return ApiResponse.of(SuccessStatus.POST_FOUND, post);
+    } catch (PostNotFoundException e) {
+      return ApiResponse.onFailure(ErrorStatus.POST_NOT_FOUND, null);
     } catch (IllegalArgumentException e) {
-      return null;
+      return ApiResponse.onFailure(ErrorStatus.INVALID_POST_ID, null);
     }
   }
 
   // PUT /posts/{id} 📝 과제
-  public void updatePost(Long id, String newTitle, String newContent) {
+  public ApiResponse<Void> updatePost(Long id, String newTitle, String newContent) {
     try {
       postService.updatePost(id, newTitle, newContent);
-      System.out.println("게시글 수정 완료");
+      return ApiResponse.of(SuccessStatus.POST_UPDATED, null);
+    } catch (PostNotFoundException e) {
+      return ApiResponse.onFailure(ErrorStatus.POST_NOT_FOUND, null);
     } catch (IllegalArgumentException e) {
-      System.out.println("🚫 " + e.getMessage());
+      return ApiResponse.onFailure(ErrorStatus._BAD_REQUEST, null);
     }
   }
 
   // DELETE /posts/{id} 📝 과제
-  public void deletePost(Long id) {
+  public ApiResponse<Void> deletePost(Long id) {
     try {
       postService.deletePost(id);
-      System.out.println("게시글 삭제 완료");
+      return ApiResponse.of(SuccessStatus.POST_DELETED, null);
+    } catch (PostNotFoundException e) {
+      return ApiResponse.onFailure(ErrorStatus.POST_NOT_FOUND, null);
     } catch (IllegalArgumentException e) {
-      System.out.println("🚫 " + e.getMessage());
+      return ApiResponse.onFailure(ErrorStatus.INVALID_POST_ID, null);
     }
   }
 }

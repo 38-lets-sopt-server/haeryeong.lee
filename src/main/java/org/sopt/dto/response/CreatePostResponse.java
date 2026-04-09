@@ -9,4 +9,9 @@ public class CreatePostResponse {
     this.id = id;
     this.message = message;
   }
+
+  @Override
+  public String toString() {
+    return "CreatePostResponse{id=" + id + ", message='" + message + "'}";
+  }
 }
