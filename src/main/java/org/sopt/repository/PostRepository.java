@@ -25,4 +25,8 @@ public class PostRepository {
     }
     return null;
   }
+
+  public Post[] findAll() {
+    return postList.toArray(new Post[0]);
+  }
 }
