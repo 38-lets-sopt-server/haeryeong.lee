@@ -48,7 +48,21 @@ public class PostService {
 
   // UPDATE 📝 과제
   public void updatePost(Long id, String newTitle, String newContent) {
-    // TODO
+    if (id == null || id <= 0) {
+      throw new IllegalArgumentException("유효한 ID를 입력해주세요");
+    }
+    if (newTitle == null || newTitle.isBlank()) {
+      throw new IllegalArgumentException("제목은 필수입니다!");
+    }
+
+    Post post = postRepository.findById(id);
+
+    if (post == null) {
+      throw new IllegalArgumentException("게시글을 찾을 수 없습니다");
+    }
+
+    post.update(newTitle, newContent);
+    postRepository.save(post);
   }
 
   // DELETE 📝 과제
