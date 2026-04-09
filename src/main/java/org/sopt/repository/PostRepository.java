@@ -29,4 +29,8 @@ public class PostRepository {
   public Post[] findAll() {
     return postList.toArray(new Post[0]);
   }
+
+  public void delete(Post post) {
+    postList.remove(post);
+  }
 }

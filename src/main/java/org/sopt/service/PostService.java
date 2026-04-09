@@ -5,6 +5,7 @@ import java.util.List;
 import org.sopt.domain.Post;
 import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.response.CreatePostResponse;
+import org.sopt.dto.response.DeletePostResponse;
 import org.sopt.dto.response.PostResponse;
 import org.sopt.repository.PostRepository;
 
@@ -67,6 +68,16 @@ public class PostService {
 
   // DELETE 📝 과제
   public void deletePost(Long id) {
-    // TODO
+    if (id == null || id <= 0) {
+      throw new IllegalArgumentException("유효한 ID를 입력해주세요");
+    }
+
+    Post post = postRepository.findById(id);
+
+    if (post == null) {
+      throw new IllegalArgumentException("게시글을 찾을 수 없습니다");
+    }
+
+    postRepository.delete(post);
   }
 }
