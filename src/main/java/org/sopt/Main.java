@@ -6,6 +6,7 @@ import org.sopt.controller.PostController;
 import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.response.CreatePostResponse;
 import org.sopt.dto.response.PostResponse;
+import org.sopt.global.exception.PostNotFoundException;
 
 public class Main {
   public static void main(String[] args) {
@@ -24,65 +25,69 @@ public class Main {
       System.out.println("0. 종료");
       System.out.print("메뉴 선택: ");
 
-      int choice = scanner.nextInt();
-      scanner.nextLine();
+      try {
+        int choice = scanner.nextInt();
+        scanner.nextLine();
 
-      switch (choice) {
-        case 1:
-          System.out.print("제목: ");
-          String title = scanner.nextLine();
-          System.out.print("내용: ");
-          String content = scanner.nextLine();
-          System.out.print("작성자: ");
-          String author = scanner.nextLine();
-          // 클라이언트가 요청 객체를 만들어서 Controller에 전달
-          CreatePostResponse response = postController.createPost(
-              new CreatePostRequest(title, content, author)
-          );
-          System.out.println(response.message);
-          break;
+        switch (choice) {
+          case 1:
+            System.out.print("제목: ");
+            String title = scanner.nextLine();
+            System.out.print("내용: ");
+            String content = scanner.nextLine();
+            System.out.print("작성자: ");
+            String author = scanner.nextLine();
+            // 클라이언트가 요청 객체를 만들어서 Controller에 전달
+            CreatePostResponse response = postController.createPost(
+                new CreatePostRequest(title, content, author)
+            );
+            System.out.println(response.message);
+            break;
 
-        case 2:
-          List<PostResponse> posts = postController.getAllPosts();
-          if (posts.isEmpty()) {
-            System.out.println("등록된 게시글이 없습니다.");
-          } else {
-            posts.forEach(p -> System.out.println(p + "\n---"));
-          }
-          break;
+          case 2:
+            List<PostResponse> posts = postController.getAllPosts();
+            if (posts.isEmpty()) {
+              System.out.println("등록된 게시글이 없습니다.");
+            } else {
+              posts.forEach(p -> System.out.println(p + "\n---"));
+            }
+            break;
 
-        case 3:
-          System.out.print("조회할 게시글 ID: ");
-          PostResponse post = postController.getPost(scanner.nextLong());
-          scanner.nextLine();
-          if (post != null) System.out.println(post);
-          break;
+          case 3:
+            System.out.print("조회할 게시글 ID: ");
+            PostResponse post = postController.getPost(scanner.nextLong());
+            scanner.nextLine();
+            if (post != null)
+              System.out.println(post);
+            break;
 
-        case 4:
-          System.out.print("수정할 게시글 ID: ");
-          Long updateId = scanner.nextLong();
-          scanner.nextLine();
-          System.out.print("새 제목: ");
-          String newTitle = scanner.nextLine();
-          System.out.print("새 내용: ");
-          String newContent = scanner.nextLine();
-          postController.updatePost(updateId, newTitle, newContent);
-          break;
+          case 4:
+            System.out.print("수정할 게시글 ID: ");
+            Long updateId = scanner.nextLong();
+            scanner.nextLine();
+            System.out.print("새 제목: ");
+            String newTitle = scanner.nextLine();
+            System.out.print("새 내용: ");
+            String newContent = scanner.nextLine();
+            postController.updatePost(updateId, newTitle, newContent);
+            break;
 
-        case 5:
-          System.out.print("삭제할 게시글 ID: ");
-          postController.deletePost(scanner.nextLong());
-          scanner.nextLine();
-          break;
+          case 5:
+            System.out.print("삭제할 게시글 ID: ");
+            postController.deletePost(scanner.nextLong());
+            scanner.nextLine();
+            break;
 
-        case 0:
-          running = false;
-          System.out.println("👋 프로그램 종료");
-          break;
-        default:
-          System.out.println("❗ 잘못된 입력입니다.");
+          case 0:
+            running = false;
+            System.out.println("👋 프로그램 종료");
+            break;
+          default:
+            System.out.println("❗ 잘못된 입력입니다.");
+        }
+      } catch (PostNotFoundException e) {
+        System.out.println(e.getMessage());
       }
     }
-    scanner.close();
   }
 }

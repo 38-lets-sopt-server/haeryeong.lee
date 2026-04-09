@@ -7,6 +7,7 @@ import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.response.CreatePostResponse;
 import org.sopt.dto.response.DeletePostResponse;
 import org.sopt.dto.response.PostResponse;
+import org.sopt.global.exception.PostNotFoundException;
 import org.sopt.repository.PostRepository;
 
 public class PostService {
@@ -41,7 +42,7 @@ public class PostService {
     Post post = postRepository.findById(id);
 
     if (post == null) {
-      throw new IllegalArgumentException("게시글을 찾을 수 없습니다");
+      throw new PostNotFoundException();
     }
 
     return new PostResponse(post);
@@ -59,7 +60,7 @@ public class PostService {
     Post post = postRepository.findById(id);
 
     if (post == null) {
-      throw new IllegalArgumentException("게시글을 찾을 수 없습니다");
+      throw new PostNotFoundException();
     }
 
     post.update(newTitle, newContent);
@@ -75,7 +76,7 @@ public class PostService {
     Post post = postRepository.findById(id);
 
     if (post == null) {
-      throw new IllegalArgumentException("게시글을 찾을 수 없습니다");
+      throw new PostNotFoundException();
     }
 
     postRepository.delete(post);
