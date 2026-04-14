@@ -1,10 +1,13 @@
 package org.sopt.service;
 
+import java.util.Arrays;
 import java.util.List;
 import org.sopt.domain.Post;
 import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.response.CreatePostResponse;
 import org.sopt.dto.response.PostResponse;
+import org.sopt.global.exception.PostNotFoundException;
+import org.sopt.global.validator.PostValidator;
 import org.sopt.repository.PostRepository;
 
 public class PostService {
@@ -12,12 +15,9 @@ public class PostService {
 
   // CREATE
   public CreatePostResponse createPost(CreatePostRequest request) {
-    if (request.title == null || request.title.isBlank()) {
-      throw new IllegalArgumentException("제목은 필수입니다!");
-    }
-    if (request.content == null || request.content.isBlank()) {
-      throw new IllegalArgumentException("내용은 필수입니다!");
-    }
+    PostValidator.validatePostTitle(request.title);
+    PostValidator.validatePostContent(request.content);
+
     String createdAt = java.time.LocalDateTime.now().toString();
     Post post = new Post(postRepository.generateId(), request.title, request.content, request.author, createdAt);
     postRepository.save(post);
@@ -26,23 +26,48 @@ public class PostService {
 
   // READ - 전체 📝 과제
   public List<PostResponse> getAllPosts() {
-    // TODO
-    return null;
+    Post[] posts = postRepository.findAll();
+    return Arrays.stream(posts).map(PostResponse::new).toList();
   }
 
   // READ - 단건 📝 과제
   public PostResponse getPost(Long id) {
-    // TODO
-    return null;
+    PostValidator.validatePostId(id);
+
+    Post post = postRepository.findById(id);
+
+    if (post == null) {
+      throw new PostNotFoundException();
+    }
+
+    return new PostResponse(post);
   }
 
   // UPDATE 📝 과제
   public void updatePost(Long id, String newTitle, String newContent) {
-    // TODO
+    PostValidator.validatePostId(id);
+    PostValidator.validatePostTitle(newTitle);
+
+    Post post = postRepository.findById(id);
+
+    if (post == null) {
+      throw new PostNotFoundException();
+    }
+
+    post.update(newTitle, newContent);
+    postRepository.save(post);
   }
 
   // DELETE 📝 과제
   public void deletePost(Long id) {
-    // TODO
+    PostValidator.validatePostId(id);
+
+    Post post = postRepository.findById(id);
+
+    if (post == null) {
+      throw new PostNotFoundException();
+    }
+
+    postRepository.delete(post);
   }
 }

@@ -2,13 +2,12 @@ package org.sopt.dto.response;
 
 import org.sopt.domain.Post;
 
-// 게시글 조회 응답 (서버 → 클라이언트)
 public class PostResponse {
-  Long id;
-  String title;
-  String content;
-  String author;
-  String createdAt;
+  public Long id;
+  public String title;
+  public String content;
+  public String author;
+  public String createdAt;
 
   public PostResponse(Post post) {
     this.id = post.getId();
@@ -20,6 +19,12 @@ public class PostResponse {
 
   @Override
   public String toString() {
-    return "[" + id + "] " + title + " - " + author + " (" + createdAt + ")\n" + content;
+    return "PostResponse{" +
+            "id=" + id +
+            ", title='" + title + '\'' +
+            ", content='" + content + '\'' +
+            ", author='" + author + '\'' +
+            ", createdAt='" + createdAt + '\'' +
+            '}';
   }
 }
