@@ -6,6 +6,7 @@ import org.sopt.domain.Post;
 import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.request.UpdatePostRequest;
 import org.sopt.dto.response.CreatePostResponse;
+import org.sopt.dto.response.PostListResponse;
 import org.sopt.dto.response.PostResponse;
 import org.sopt.global.code.status.ErrorStatus;
 import org.sopt.global.exception.PostNotFoundException;
@@ -30,10 +31,26 @@ public class PostService {
     return new CreatePostResponse(savedPost.getId(), "게시글 등록 완료!");
   }
 
-  public List<PostResponse> getAllPosts() {
-    return postRepository.findAll().stream()
-        .map(PostResponse::new)
-        .toList();
+  public PostListResponse getAllPosts(int page, int size) {
+    if (page < 0) { throw new IllegalArgumentException("page는 0 이상이어야 합니다."); }
+    if (size <= 0) { throw new IllegalArgumentException("size는 1 이상이어야 합니다."); }
+
+    List<Post> posts = postRepository.findAll();
+
+    int totalElements = posts.size();
+    int totalPages = (int) Math.ceil((double) totalElements / size);
+    int start = page * size;
+    int end = Math.min(start + size, totalElements);
+
+    List<PostResponse> postResponses;
+
+    if (start >= totalElements) {
+      postResponses = List.of();
+    } else {
+      postResponses = posts.subList(start, end).stream().map(PostResponse::new).toList();
+    }
+
+    return new PostListResponse(postResponses, postResponses.size(), totalPages, totalElements, page == 0, page >= totalPages - 1);
   }
 
   public PostResponse getPost(Long id) {

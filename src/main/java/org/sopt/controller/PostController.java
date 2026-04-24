@@ -5,6 +5,7 @@ import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.request.UpdatePostRequest;
 import org.sopt.dto.response.ApiResponse;
 import org.sopt.dto.response.CreatePostResponse;
+import org.sopt.dto.response.PostListResponse;
 import org.sopt.dto.response.PostResponse;
 import org.sopt.global.code.status.ErrorStatus;
 import org.sopt.global.code.status.SuccessStatus;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -42,9 +44,12 @@ public class PostController {
 
   // GET /posts 📝 과제
   @GetMapping
-  public ResponseEntity<ApiResponse<List<PostResponse>>> getAllPosts() {
-    List<PostResponse> response = postService.getAllPosts();
-    return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.onSuccess(response));
+  public ResponseEntity<ApiResponse<PostListResponse>> getAllPosts(
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size
+  ) {
+    PostListResponse response = postService.getAllPosts(page, size);
+    return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.of(SuccessStatus.POSTS_FOUND, response));
   }
 
   // GET /posts/{id} 📝 과제
