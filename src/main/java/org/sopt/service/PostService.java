@@ -1,6 +1,5 @@
 package org.sopt.service;
 
-import java.util.Arrays;
 import java.util.List;
 import org.sopt.domain.Post;
 import org.sopt.dto.request.CreatePostRequest;
