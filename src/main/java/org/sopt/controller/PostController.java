@@ -2,6 +2,7 @@ package org.sopt.controller;
 
 import java.util.List;
 import org.sopt.dto.request.CreatePostRequest;
+import org.sopt.dto.request.UpdatePostRequest;
 import org.sopt.dto.response.ApiResponse;
 import org.sopt.dto.response.CreatePostResponse;
 import org.sopt.dto.response.PostResponse;
@@ -9,59 +10,68 @@ import org.sopt.global.code.status.ErrorStatus;
 import org.sopt.global.code.status.SuccessStatus;
 import org.sopt.global.exception.PostNotFoundException;
 import org.sopt.service.PostService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+@RestController
+@RequestMapping("/posts")
 public class PostController {
-  private final PostService postService = new PostService();
 
-  // POST /posts
-  public ApiResponse<CreatePostResponse> createPost(CreatePostRequest request) {
-    try {
-      CreatePostResponse response = postService.createPost(request);
-      return ApiResponse.of(SuccessStatus.POST_CREATED, response);
-    } catch (IllegalArgumentException e) {
-      return ApiResponse.onFailure(ErrorStatus._BAD_REQUEST, null);
-    }
+  private final PostService postService;
+
+  public PostController(PostService postService) {
+    this.postService = postService;
+  }
+
+  // POST /posts ✅ 같이 구현
+  @PostMapping
+  public ResponseEntity<CreatePostResponse> createPost(
+      @RequestBody CreatePostRequest request
+  ) {
+    CreatePostResponse response = postService.createPost(request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   // GET /posts 📝 과제
-  public ApiResponse<List<PostResponse>> getAllPosts() {
-    List<PostResponse> posts = postService.getAllPosts();
-    return ApiResponse.of(SuccessStatus.POSTS_FOUND, posts);
+  @GetMapping
+  public ResponseEntity<List<PostResponse>> getAllPosts() {
+    List<PostResponse> response = postService.getAllPosts();
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
   // GET /posts/{id} 📝 과제
-  public ApiResponse<PostResponse> getPost(Long id) {
-    try {
-      PostResponse post = postService.getPost(id);
-      return ApiResponse.of(SuccessStatus.POST_FOUND, post);
-    } catch (PostNotFoundException e) {
-      return ApiResponse.onFailure(ErrorStatus.POST_NOT_FOUND, null);
-    } catch (IllegalArgumentException e) {
-      return ApiResponse.onFailure(ErrorStatus.INVALID_POST_ID, null);
-    }
+  @GetMapping("/{id}")
+  public ResponseEntity<PostResponse> getPost(
+      @PathVariable Long id
+  ) {
+    PostResponse response = postService.getPost(id);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
   // PUT /posts/{id} 📝 과제
-  public ApiResponse<Void> updatePost(Long id, String newTitle, String newContent) {
-    try {
-      postService.updatePost(id, newTitle, newContent);
-      return ApiResponse.of(SuccessStatus.POST_UPDATED, null);
-    } catch (PostNotFoundException e) {
-      return ApiResponse.onFailure(ErrorStatus.POST_NOT_FOUND, null);
-    } catch (IllegalArgumentException e) {
-      return ApiResponse.onFailure(ErrorStatus._BAD_REQUEST, null);
-    }
+  @PutMapping("/{id}")
+  public ResponseEntity<Void> updatePost(
+      @PathVariable Long id,
+      @RequestBody UpdatePostRequest request
+  ) {
+    postService.updatePost(id, request);
+    return ResponseEntity.status(HttpStatus.OK).build();
   }
 
   // DELETE /posts/{id} 📝 과제
-  public ApiResponse<Void> deletePost(Long id) {
-    try {
-      postService.deletePost(id);
-      return ApiResponse.of(SuccessStatus.POST_DELETED, null);
-    } catch (PostNotFoundException e) {
-      return ApiResponse.onFailure(ErrorStatus.POST_NOT_FOUND, null);
-    } catch (IllegalArgumentException e) {
-      return ApiResponse.onFailure(ErrorStatus.INVALID_POST_ID, null);
-    }
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deletePost(
+      @PathVariable Long id
+  ) {
+    Long deletedPostId = postService.deletePost(id);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }

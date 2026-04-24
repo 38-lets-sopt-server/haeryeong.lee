@@ -11,6 +11,10 @@ public class PostValidator {
     if (title == null || title.trim().isEmpty()) {
       throw new IllegalArgumentException("게시글 제목은 필수입니다.");
     }
+
+    if (title.length() > 50) {
+      throw new IllegalArgumentException("게시글 제목은 50자 이하로 입력해주세요.");
+    }
   }
 
   public static void validatePostContent(String content) {

@@ -8,6 +8,8 @@ public class PostResponse {
   public String content;
   public String author;
   public String createdAt;
+  public boolean isAnonymous;
+  public boolean isQuestion;
 
   public PostResponse(Post post) {
     this.id = post.getId();
@@ -15,16 +17,7 @@ public class PostResponse {
     this.content = post.getContent();
     this.author = post.getAuthor();
     this.createdAt = post.getCreatedAt();
-  }
-
-  @Override
-  public String toString() {
-    return "PostResponse{" +
-            "id=" + id +
-            ", title='" + title + '\'' +
-            ", content='" + content + '\'' +
-            ", author='" + author + '\'' +
-            ", createdAt='" + createdAt + '\'' +
-            '}';
+    this.isAnonymous = post.isAnonymous();
+    this.isQuestion = post.isQuestion();
   }
 }
