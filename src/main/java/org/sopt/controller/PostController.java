@@ -33,45 +33,45 @@ public class PostController {
 
   // POST /posts ✅ 같이 구현
   @PostMapping
-  public ResponseEntity<CreatePostResponse> createPost(
+  public ResponseEntity<ApiResponse<CreatePostResponse>> createPost(
       @RequestBody CreatePostRequest request
   ) {
     CreatePostResponse response = postService.createPost(request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.of(SuccessStatus.POST_CREATED, response));
   }
 
   // GET /posts 📝 과제
   @GetMapping
-  public ResponseEntity<List<PostResponse>> getAllPosts() {
+  public ResponseEntity<ApiResponse<List<PostResponse>>> getAllPosts() {
     List<PostResponse> response = postService.getAllPosts();
-    return ResponseEntity.status(HttpStatus.OK).body(response);
+    return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.onSuccess(response));
   }
 
   // GET /posts/{id} 📝 과제
   @GetMapping("/{id}")
-  public ResponseEntity<PostResponse> getPost(
+  public ResponseEntity<ApiResponse<PostResponse>> getPost(
       @PathVariable Long id
   ) {
     PostResponse response = postService.getPost(id);
-    return ResponseEntity.status(HttpStatus.OK).body(response);
+    return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.onSuccess(response));
   }
 
   // PUT /posts/{id} 📝 과제
   @PutMapping("/{id}")
-  public ResponseEntity<Void> updatePost(
+  public ResponseEntity<ApiResponse<Long>> updatePost(
       @PathVariable Long id,
       @RequestBody UpdatePostRequest request
   ) {
-    postService.updatePost(id, request);
-    return ResponseEntity.status(HttpStatus.OK).build();
+    Long updatedId = postService.updatePost(id, request);
+    return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.of(SuccessStatus.POST_UPDATED, updatedId));
   }
 
   // DELETE /posts/{id} 📝 과제
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deletePost(
+  public ResponseEntity<ApiResponse<Long>> deletePost(
       @PathVariable Long id
   ) {
     Long deletedPostId = postService.deletePost(id);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.of(SuccessStatus.POST_DELETED, deletedPostId));
   }
 }

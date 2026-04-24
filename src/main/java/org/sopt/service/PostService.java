@@ -7,6 +7,7 @@ import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.request.UpdatePostRequest;
 import org.sopt.dto.response.CreatePostResponse;
 import org.sopt.dto.response.PostResponse;
+import org.sopt.global.code.status.ErrorStatus;
 import org.sopt.global.exception.PostNotFoundException;
 import org.sopt.global.validator.PostValidator;
 import org.sopt.repository.PostRepository;
@@ -38,22 +39,23 @@ public class PostService {
   public PostResponse getPost(Long id) {
     PostValidator.validatePostId(id);
     Post post = postRepository.findById(id)
-        .orElseThrow(() -> new PostNotFoundException());
+        .orElseThrow(() -> new PostNotFoundException(ErrorStatus.POST_NOT_FOUND));
     return new PostResponse(post);
   }
 
-  public void updatePost(Long id, UpdatePostRequest request) {
+  public Long updatePost(Long id, UpdatePostRequest request) {
     PostValidator.validatePostTitle(request.getTitle());
 
     Post post = postRepository.findById(id)
-        .orElseThrow(() -> new PostNotFoundException());
+        .orElseThrow(() -> new PostNotFoundException(ErrorStatus.POST_NOT_FOUND));
 
     post.update(request.title, request.content, request.isQuestion(), request.isAnonymous());
+    return id;
   }
 
   public Long deletePost(Long id) {
     Post post = postRepository.findById(id)
-        .orElseThrow(() -> new PostNotFoundException());
+        .orElseThrow(() -> new PostNotFoundException(ErrorStatus.POST_NOT_FOUND));
     postRepository.delete(post);
     return id;
   }
