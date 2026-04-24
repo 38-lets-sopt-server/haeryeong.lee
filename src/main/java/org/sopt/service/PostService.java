@@ -10,6 +10,7 @@ import org.sopt.dto.response.PostListResponse;
 import org.sopt.dto.response.PostResponse;
 import org.sopt.global.code.status.ErrorCode;
 import org.sopt.global.exception.GeneralException;
+import org.sopt.global.exception.PostNotFoundException;
 import org.sopt.global.validator.PostValidator;
 import org.sopt.repository.PostRepository;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class PostService {
     PostValidator.validatePostTitle(request.getTitle());
     Long id = postRepository.generateId();
 
-    Post post = new Post(id, request.getTitle(), request.getContent(), request.getAuthor(), request.isQuestion(), request.isAnonymous(), request.getBoardType());
+    Post post = new Post(id, request.getTitle(), request.getContent(), request.getAuthor(), request.isAnonymous(), request.isQuestion(), request.getBoardType());
     Post savedPost = postRepository.save(post);
     return new CreatePostResponse(savedPost.getId(), "게시글 등록 완료!");
   }
@@ -64,7 +65,7 @@ public class PostService {
   public PostResponse getPost(Long id) {
     PostValidator.validatePostId(id);
     Post post = postRepository.findById(id)
-        .orElseThrow(() -> new GeneralException(ErrorCode.POST_NOT_FOUND));
+        .orElseThrow(PostNotFoundException::new);
     return new PostResponse(post);
   }
 
@@ -72,7 +73,7 @@ public class PostService {
     PostValidator.validatePostTitle(request.getTitle());
 
     Post post = postRepository.findById(id)
-        .orElseThrow(() -> new GeneralException(ErrorCode.POST_NOT_FOUND));
+        .orElseThrow(PostNotFoundException::new);
 
     post.update(request.title, request.content, request.isQuestion(), request.isAnonymous());
     return id;
@@ -80,7 +81,7 @@ public class PostService {
 
   public Long deletePost(Long id) {
     Post post = postRepository.findById(id)
-        .orElseThrow(() -> new GeneralException(ErrorCode.POST_NOT_FOUND));
+        .orElseThrow(PostNotFoundException::new);
     postRepository.delete(post);
     return id;
   }
