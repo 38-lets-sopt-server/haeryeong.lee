@@ -10,8 +10,9 @@ public class Post {
   private boolean isQuestion;
   private boolean isAnonymous;
   private String createdAt; // 목록, 상세 화면 — 작성 시각
+  private BoardType boardType;
 
-  public Post(Long id, String title, String content, String author, boolean isAnonymous, boolean isQuestion) {
+  public Post(Long id, String title, String content, String author, boolean isAnonymous, boolean isQuestion, BoardType boardType) {
     this.id = id;
     this.title = title;
     this.content = content;
@@ -19,6 +20,7 @@ public class Post {
     this.isAnonymous = isAnonymous;
     this.isQuestion = isQuestion;
     this.createdAt = LocalDateTime.now().toString();
+    this.boardType = boardType;
   }
 
   public Long getId() { return id; }
@@ -28,6 +30,8 @@ public class Post {
   public boolean isQuestion() { return isQuestion; }
   public boolean isAnonymous() { return isAnonymous; }
   public String getCreatedAt() { return createdAt; }
+  public BoardType getBoardType() { return boardType; }
+
 
   public void update(String title, String content, boolean isQuestion, boolean isAnonymous) {
     this.title = title;

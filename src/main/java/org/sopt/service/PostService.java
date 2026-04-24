@@ -1,6 +1,7 @@
 package org.sopt.service;
 
 import java.util.List;
+import org.sopt.domain.BoardType;
 import org.sopt.domain.Post;
 import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.request.UpdatePostRequest;
@@ -25,12 +26,12 @@ public class PostService {
     PostValidator.validatePostTitle(request.getTitle());
     Long id = postRepository.generateId();
 
-    Post post = new Post(id, request.getTitle(), request.getContent(), request.getAuthor(), request.isQuestion(), request.isAnonymous());
+    Post post = new Post(id, request.getTitle(), request.getContent(), request.getAuthor(), request.isQuestion(), request.isAnonymous(), request.getBoardType());
     Post savedPost = postRepository.save(post);
     return new CreatePostResponse(savedPost.getId(), "게시글 등록 완료!");
   }
 
-  public PostListResponse getAllPosts(int page, int size) {
+  public PostListResponse getAllPosts(int page, int size, BoardType boardType) {
     if (page < 0) {
       throw new GeneralException(ErrorCode.INVALID_PAGE_NUMBER);
     }
@@ -39,6 +40,10 @@ public class PostService {
     }
 
     List<Post> posts = postRepository.findAll();
+
+    if (boardType != null) {
+      posts = posts.stream().filter(post -> post.getBoardType() == boardType).toList();
+    }
 
     int totalElements = posts.size();
     int totalPages = (int) Math.ceil((double) totalElements / size);

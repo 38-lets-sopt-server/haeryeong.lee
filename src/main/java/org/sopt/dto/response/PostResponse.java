@@ -1,5 +1,6 @@
 package org.sopt.dto.response;
 
+import org.sopt.domain.BoardType;
 import org.sopt.domain.Post;
 
 public class PostResponse {
@@ -10,6 +11,7 @@ public class PostResponse {
   public String createdAt;
   public boolean isAnonymous;
   public boolean isQuestion;
+  public BoardType boardType;
 
   public PostResponse(Post post) {
     this.id = post.getId();
@@ -19,5 +21,6 @@ public class PostResponse {
     this.createdAt = post.getCreatedAt();
     this.isAnonymous = post.isAnonymous();
     this.isQuestion = post.isQuestion();
+    this.boardType = post.getBoardType();
   }
 }
