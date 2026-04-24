@@ -57,7 +57,7 @@ public class PostController {
       @PathVariable Long id
   ) {
     PostResponse response = postService.getPost(id);
-    return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.onSuccess(response));
+    return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.of(SuccessStatus.POST_FOUND, response));
   }
 
   // PUT /posts/{id} 📝 과제
@@ -76,6 +76,6 @@ public class PostController {
       @PathVariable Long id
   ) {
     Long deletedPostId = postService.deletePost(id);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.of(SuccessStatus.POST_DELETED, deletedPostId));
+    return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.of(SuccessStatus.POST_DELETED, deletedPostId));
   }
 }
