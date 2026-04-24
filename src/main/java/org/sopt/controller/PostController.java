@@ -1,15 +1,12 @@
 package org.sopt.controller;
 
-import java.util.List;
 import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.request.UpdatePostRequest;
 import org.sopt.dto.response.ApiResponse;
 import org.sopt.dto.response.CreatePostResponse;
 import org.sopt.dto.response.PostListResponse;
 import org.sopt.dto.response.PostResponse;
-import org.sopt.global.code.status.ErrorStatus;
 import org.sopt.global.code.status.SuccessStatus;
-import org.sopt.global.exception.PostNotFoundException;
 import org.sopt.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
