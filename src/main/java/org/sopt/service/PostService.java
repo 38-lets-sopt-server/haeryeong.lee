@@ -1,73 +1,88 @@
 package org.sopt.service;
 
-import java.util.Arrays;
 import java.util.List;
+import org.sopt.domain.BoardType;
 import org.sopt.domain.Post;
 import org.sopt.dto.request.CreatePostRequest;
+import org.sopt.dto.request.UpdatePostRequest;
 import org.sopt.dto.response.CreatePostResponse;
+import org.sopt.dto.response.PostListResponse;
 import org.sopt.dto.response.PostResponse;
+import org.sopt.global.code.status.ErrorCode;
+import org.sopt.global.exception.GeneralException;
 import org.sopt.global.exception.PostNotFoundException;
 import org.sopt.global.validator.PostValidator;
 import org.sopt.repository.PostRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class PostService {
-  private final PostRepository postRepository = new PostRepository();
+  private final PostRepository postRepository;
 
-  // CREATE
+  public PostService(PostRepository postRepository) {
+    this.postRepository = postRepository;
+  }
+
   public CreatePostResponse createPost(CreatePostRequest request) {
-    PostValidator.validatePostTitle(request.title);
-    PostValidator.validatePostContent(request.content);
+    PostValidator.validatePostTitle(request.getTitle());
+    Long id = postRepository.generateId();
 
-    String createdAt = java.time.LocalDateTime.now().toString();
-    Post post = new Post(postRepository.generateId(), request.title, request.content, request.author, createdAt);
-    postRepository.save(post);
-    return new CreatePostResponse(post.getId(), "게시글 등록 완료!");
+    Post post = new Post(id, request.getTitle(), request.getContent(), request.getAuthor(), request.isAnonymous(), request.isQuestion(), request.getBoardType());
+    Post savedPost = postRepository.save(post);
+    return new CreatePostResponse(savedPost.getId(), "게시글 등록 완료!");
   }
 
-  // READ - 전체 📝 과제
-  public List<PostResponse> getAllPosts() {
-    Post[] posts = postRepository.findAll();
-    return Arrays.stream(posts).map(PostResponse::new).toList();
-  }
-
-  // READ - 단건 📝 과제
-  public PostResponse getPost(Long id) {
-    PostValidator.validatePostId(id);
-
-    Post post = postRepository.findById(id);
-
-    if (post == null) {
-      throw new PostNotFoundException();
+  public PostListResponse getAllPosts(int page, int size, BoardType boardType) {
+    if (page < 0) {
+      throw new GeneralException(ErrorCode.INVALID_PAGE_NUMBER);
+    }
+    if (size <= 0) {
+      throw new GeneralException(ErrorCode.INVALID_PAGE_SIZE);
     }
 
+    List<Post> posts = postRepository.findAll();
+
+    if (boardType != null) {
+      posts = posts.stream().filter(post -> post.getBoardType() == boardType).toList();
+    }
+
+    int totalElements = posts.size();
+    int totalPages = (int) Math.ceil((double) totalElements / size);
+    int start = page * size;
+    int end = Math.min(start + size, totalElements);
+
+    List<PostResponse> postResponses;
+
+    if (start >= totalElements) {
+      postResponses = List.of();
+    } else {
+      postResponses = posts.subList(start, end).stream().map(PostResponse::new).toList();
+    }
+
+    return new PostListResponse(postResponses, postResponses.size(), totalPages, totalElements, page == 0, page >= totalPages - 1);
+  }
+
+  public PostResponse getPost(Long id) {
+    PostValidator.validatePostId(id);
+    Post post = postRepository.findById(id)
+        .orElseThrow(PostNotFoundException::new);
     return new PostResponse(post);
   }
 
-  // UPDATE 📝 과제
-  public void updatePost(Long id, String newTitle, String newContent) {
-    PostValidator.validatePostId(id);
-    PostValidator.validatePostTitle(newTitle);
+  public Long updatePost(Long id, UpdatePostRequest request) {
+    PostValidator.validatePostTitle(request.getTitle());
 
-    Post post = postRepository.findById(id);
+    Post post = postRepository.findById(id)
+        .orElseThrow(PostNotFoundException::new);
 
-    if (post == null) {
-      throw new PostNotFoundException();
-    }
-
-    post.update(newTitle, newContent);
-    postRepository.save(post);
+    post.update(request.title, request.content, request.isQuestion(), request.isAnonymous());
+    return id;
   }
 
-  // DELETE 📝 과제
-  public void deletePost(Long id) {
-    PostValidator.validatePostId(id);
-
-    Post post = postRepository.findById(id);
-
-    if (post == null) {
-      throw new PostNotFoundException();
-    }
-
+  public Long deletePost(Long id) {
+    Post post = postRepository.findById(id)
+        .orElseThrow(PostNotFoundException::new);
     postRepository.delete(post);
+    return id;
   }
 }

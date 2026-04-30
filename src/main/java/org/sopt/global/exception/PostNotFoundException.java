@@ -1,10 +1,16 @@
 package org.sopt.global.exception;
 
-public class PostNotFoundException extends RuntimeException {
+import org.sopt.global.code.status.ErrorCode;
 
-  private static final String MESSAGE = "게시글을 찾을 수 없습니다.";
+public class PostNotFoundException extends RuntimeException {
+  private final ErrorCode errorCode;
 
   public PostNotFoundException() {
-    super(MESSAGE);
+    super(ErrorCode.POST_NOT_FOUND.getMessage());
+    this.errorCode = ErrorCode.POST_NOT_FOUND;
+  }
+
+  public ErrorCode getErrorCode() {
+    return errorCode;
   }
 }

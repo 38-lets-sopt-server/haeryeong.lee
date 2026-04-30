@@ -1,36 +1,13 @@
 package org.sopt.repository;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.sopt.domain.Post;
 
-public class PostRepository {
-  private final List<Post> postList = new ArrayList<>();
-  private Long nextId = 1L;
-
-  public Post save(Post post) {
-    postList.add(post);
-    return post;
-  }
-
-  public Long generateId() {
-    return nextId++;
-  }
-
-  public Post findById(Long id) {
-    for (Post post : postList) {
-      if (post.getId().equals(id)) {
-        return post;
-      }
-    }
-    return null;
-  }
-
-  public Post[] findAll() {
-    return postList.toArray(new Post[0]);
-  }
-
-  public void delete(Post post) {
-    postList.remove(post);
-  }
+public interface PostRepository {
+  Long generateId();
+  Post save(Post post);
+  Optional<Post> findById(Long id);
+  List<Post> findAll();
+  void delete(Post post);
 }
