@@ -11,7 +11,8 @@ public enum ErrorCode implements BaseCode {
   INVALID_POST_ID(HttpStatus.BAD_REQUEST, "POST4002", "유효한 ID를 입력해주세요."),
   TITLE_REQUIRED(HttpStatus.BAD_REQUEST, "POST4003", "제목은 필수입니다."),
   TITLE_TOO_LONG(HttpStatus.BAD_REQUEST, "POST4004", "게시글 제목은 50자 이하로 입력해주세요."),
-  CONTENT_REQUIRED(HttpStatus.BAD_REQUEST, "POST4005", "내용은 필수입니다.");
+  CONTENT_REQUIRED(HttpStatus.BAD_REQUEST, "POST4005", "내용은 필수입니다."),
+  USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER4001", "사용자를 찾을 수 없습니다.");
 
   private final HttpStatus httpStatus;
   private final String code;
