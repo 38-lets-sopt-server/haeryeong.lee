@@ -83,21 +83,23 @@ public class PostService {
   }
 
   @Transactional  // 변경 → 더티 체킹으로 save() 없이 자동 UPDATE
-  public Long updatePost(Long id, UpdatePostRequest request) { // TODO: PostResponse 반환하도록 수정해보기
+  public PostResponse updatePost(Long id, UpdatePostRequest request) {
     PostValidator.validatePostTitle(request.title());
 
     Post post = postRepository.findById(id)
         .orElseThrow(PostNotFoundException::new);
 
     post.update(request.title(), request.content(), request.isQuestion(), request.isAnonymous()); // save() 호출 없어도 트랜잭션 커밋 시 UPDATE 쿼리 자동 실행
-    return id;
+    return new PostResponse(post);
   }
 
   // DELETE 📝 과제
-  public Long deletePost(Long id) {
+  @Transactional
+  public PostResponse deletePost(Long id) {
     Post post = postRepository.findById(id)
         .orElseThrow(PostNotFoundException::new);
+    PostResponse response = new PostResponse(post);
     postRepository.delete(post);
-    return id;
+    return response;
   }
 }

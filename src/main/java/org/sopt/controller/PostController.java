@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.sopt.domain.BoardType;
+import org.sopt.domain.Post;
 import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.request.UpdatePostRequest;
 import org.sopt.dto.response.ApiResponse;
@@ -96,13 +97,13 @@ public class PostController {
       @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "유효성 검증에 실패했습니다."),
       @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.")
   })
-  public ResponseEntity<ApiResponse<Long>> updatePost(
+  public ResponseEntity<ApiResponse<PostResponse>> updatePost(
       @Parameter(description = "수정할 게시글 ID", example = "1")
       @PathVariable Long id,
       @RequestBody UpdatePostRequest request
   ) {
-    Long updatedId = postService.updatePost(id, request);
-    return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.of(SuccessStatus.POST_UPDATED, updatedId));
+    PostResponse response = postService.updatePost(id, request);
+    return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.of(SuccessStatus.POST_UPDATED, response));
   }
 
   // DELETE /posts/{id} 📝 과제
@@ -113,11 +114,11 @@ public class PostController {
       @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 게시글 ID입니다."),
       @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.")
   })
-  public ResponseEntity<ApiResponse<Long>> deletePost(
+  public ResponseEntity<ApiResponse<PostResponse>> deletePost(
       @Parameter(description = "삭제할 게시글 ID", example = "1")
       @PathVariable Long id
   ) {
-    Long deletedPostId = postService.deletePost(id);
-    return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.of(SuccessStatus.POST_DELETED, deletedPostId));
+    PostResponse response = postService.deletePost(id);
+    return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.of(SuccessStatus.POST_DELETED, response));
   }
 }
