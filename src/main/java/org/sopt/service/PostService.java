@@ -38,7 +38,7 @@ public class PostService {
     User user = userRepository.findById(request.getUserId())
         .orElseThrow(PostNotFoundException::new);
 
-    Post post = new Post(request.getTitle(), request.getContent(), user, request.isAnonymous(), request.isQuestion(), request.getBoardType());
+    Post post = new Post(request.getTitle(), request.getContent(), user, request.isQuestion(), request.isAnonymous(), request.getBoardType());
     postRepository.save(post);
     return new CreatePostResponse(post.getId(), "게시글 등록 완료!");
   }

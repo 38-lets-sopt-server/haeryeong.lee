@@ -63,4 +63,15 @@ public class Post {
   public BoardType getBoardType() {
     return this.boardType;
   }
+
+  public String getAuthor() { return this.user.getNickname(); }
+
+  public String getCreatedAt() { return this.createdAt.toString(); }
+
+  public boolean isAnonymous() { return this.isAnonymous; }
+
+  public boolean isQuestion() { return this.isQuestion; }
+
+  public User getUser() { return this.user; }
+
 }
