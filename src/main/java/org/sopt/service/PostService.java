@@ -33,12 +33,12 @@ public class PostService {
 
   @Transactional  // 저장 → DB 변경 발생 → 트랜잭션 커밋 시 반영
   public CreatePostResponse createPost(CreatePostRequest request) {
-    PostValidator.validatePostTitle(request.getTitle());
+    PostValidator.validatePostTitle(request.title());
 
-    User user = userRepository.findById(request.getUserId())
+    User user = userRepository.findById(request.userId())
         .orElseThrow(PostNotFoundException::new);
 
-    Post post = new Post(request.getTitle(), request.getContent(), user, request.isQuestion(), request.isAnonymous(), request.getBoardType());
+    Post post = new Post(request.title(), request.content(), user, request.isQuestion(), request.isAnonymous(), request.boardType());
     postRepository.save(post);
     return new CreatePostResponse(post.getId(), "게시글 등록 완료!");
   }
@@ -84,12 +84,12 @@ public class PostService {
 
   @Transactional  // 변경 → 더티 체킹으로 save() 없이 자동 UPDATE
   public Long updatePost(Long id, UpdatePostRequest request) { // TODO: PostResponse 반환하도록 수정해보기
-    PostValidator.validatePostTitle(request.getTitle());
+    PostValidator.validatePostTitle(request.title());
 
     Post post = postRepository.findById(id)
         .orElseThrow(PostNotFoundException::new);
 
-    post.update(request.title, request.content, request.isQuestion(), request.isAnonymous()); // save() 호출 없어도 트랜잭션 커밋 시 UPDATE 쿼리 자동 실행
+    post.update(request.title(), request.content(), request.isQuestion(), request.isAnonymous()); // save() 호출 없어도 트랜잭션 커밋 시 UPDATE 쿼리 자동 실행
     return id;
   }
 

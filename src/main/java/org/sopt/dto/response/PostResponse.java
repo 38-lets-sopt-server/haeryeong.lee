@@ -3,24 +3,27 @@ package org.sopt.dto.response;
 import org.sopt.domain.BoardType;
 import org.sopt.domain.Post;
 
-public class PostResponse {
-  public Long id;
-  public String title;
-  public String content;
-  public String author;
-  public String createdAt;
-  public boolean isAnonymous;
-  public boolean isQuestion;
-  public BoardType boardType;
+public record PostResponse(
+  Long id,
+  String title,
+  String content,
+  String author,
+  String createdAt,
+  boolean isAnonymous,
+  boolean isQuestion,
+  BoardType boardType
+) {
 
   public PostResponse(Post post) {
-    this.id = post.getId();
-    this.title = post.getTitle();
-    this.content = post.getContent();
-    this.author = post.getAuthor();
-    this.createdAt = post.getCreatedAt();
-    this.isAnonymous = post.isAnonymous();
-    this.isQuestion = post.isQuestion();
-    this.boardType = post.getBoardType();
+    this(
+      post.getId(),
+      post.getTitle(),
+      post.getContent(),
+      post.getAuthor(),
+      post.getCreatedAt().toString(),
+      post.isAnonymous(),
+      post.isQuestion(),
+      post.getBoardType()
+    );
   }
 }
