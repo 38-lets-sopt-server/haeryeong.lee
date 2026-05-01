@@ -10,14 +10,17 @@ import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.request.UpdatePostRequest;
 import org.sopt.dto.response.ApiResponse;
 import org.sopt.dto.response.CreatePostResponse;
+import org.sopt.dto.response.LikeResponse;
 import org.sopt.dto.response.PostListResponse;
 import org.sopt.dto.response.PostResponse;
 import org.sopt.global.code.status.SuccessStatus;
+import org.sopt.service.LikeService;
 import org.sopt.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -32,9 +35,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostController {
 
   private final PostService postService;
+  private final LikeService likeService;
 
-  public PostController(PostService postService) {
+  public PostController(PostService postService, LikeService likeService) {
     this.postService = postService;
+    this.likeService = likeService;
   }
 
   // POST /posts ✅ 같이 구현
@@ -120,5 +125,22 @@ public class PostController {
   ) {
     PostResponse response = postService.deletePost(id);
     return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.of(SuccessStatus.POST_DELETED, response));
+  }
+
+  @PatchMapping("/{postId}/likes")
+  @Operation(summary = "게시글 좋아요/취소", description = "게시글 ID로 좋아요를 누르거나 취소합니다.")
+  @ApiResponses({
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "좋아요 상태가 성공적으로 변경되었습니다."),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 게시글 ID 또는 사용자 ID입니다."),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "게시글 또는 사용자를 찾을 수 없습니다.")
+  })
+  public ResponseEntity<ApiResponse<LikeResponse>> toggleLike(
+      @Parameter(description = "좋아요/취소할 게시글 ID", example = "1")
+      @PathVariable Long postId,
+      @RequestParam Long userId
+  ) {
+    LikeResponse response = likeService.toggleLike(postId, userId);
+    SuccessStatus status = response.isLiked() ? SuccessStatus.LIKE_CREATED : SuccessStatus.LIKE_DELETED;
+    return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.of(status, response));
   }
 }
