@@ -1,15 +1,31 @@
 package org.sopt.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.sopt.domain.BoardType;
 
 // 게시글 작성 요청 (클라이언트 → 서버)
+@Schema(description = "게시글 작성 요청")
 public class CreatePostRequest {
+
+  @Schema(description = "작성자 ID", example = "1")
   private Long userId;
+
+  @Schema(description = "게시글 제목", example = "오늘 학식 뭐임")
   private String title;
+
+  @Schema(description = "게시글 내용", example = "돈까스래")
   private String content;
+
+  @Schema(description = "작성자명", example = "익명")
   private String author;
+
+  @Schema(description = "질문 게시글 여부", example = "false")
   private boolean isQuestion;
+
+  @Schema(description = "익명 여부", example = "true")
   private boolean isAnonymous;
+
+  @Schema(description = "게시판 타입", example = "FREE")
   private BoardType boardType;
 
   public CreatePostRequest(Long userId, String title, String content, String author, boolean isQuestion, boolean isAnonymous, BoardType boardType) {
