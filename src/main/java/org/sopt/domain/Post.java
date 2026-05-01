@@ -7,10 +7,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDateTime;
 
 @Entity  // "이 클래스를 DB 테이블과 매핑해요" — 영속성 컨텍스트가 이 클래스를 관리해요
-public class Post {
+public class Post extends BaseTimeEntity {
 
   @Id // 앞에서 배운 PK
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +26,6 @@ public class Post {
   private boolean isQuestion;
   private boolean isAnonymous;
   private BoardType boardType;
-  private LocalDateTime createdAt;
 
   protected Post() {}  // JPA 기본 생성자
 
@@ -37,7 +35,6 @@ public class Post {
     this.user = user;
     this.isQuestion = isQuestion;
     this.isAnonymous = isAnonymous;
-    this.createdAt = LocalDateTime.now();
     this.boardType = boardType;
   }
 
@@ -65,8 +62,6 @@ public class Post {
   }
 
   public String getAuthor() { return this.user.getNickname(); }
-
-  public String getCreatedAt() { return this.createdAt.toString(); }
 
   public boolean isAnonymous() { return this.isAnonymous; }
 
