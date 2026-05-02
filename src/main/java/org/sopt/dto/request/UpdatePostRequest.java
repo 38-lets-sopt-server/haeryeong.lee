@@ -1,20 +1,20 @@
 package org.sopt.dto.request;
 
-public class UpdatePostRequest {
-  public String title;
-  public String content;
-  public boolean isQuestion;
-  public boolean isAnonymous;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-  public UpdatePostRequest(String title, String content, boolean isQuestion, boolean isAnonymous) {
-    this.title = title;
-    this.content = content;
-    this.isQuestion = isQuestion;
-    this.isAnonymous = isAnonymous;
-  }
+@Schema(description = "게시글 수정 요청")
+public record UpdatePostRequest(
 
-  public String getTitle() { return title; }
-  public String getContent() { return content; }
-  public boolean isQuestion() { return isQuestion; }
-  public boolean isAnonymous() { return isAnonymous; }
+  @Schema(description = "수정할 제목", example = "수정된 제목")
+  String title,
+
+  @Schema(description = "수정할 내용", example = "수정된 내용입니다.")
+  String content,
+
+  @Schema(description = "질문 게시글 여부", example = "false")
+  boolean isQuestion,
+
+  @Schema(description = "익명 여부", example = "true")
+  boolean isAnonymous
+) {
 }

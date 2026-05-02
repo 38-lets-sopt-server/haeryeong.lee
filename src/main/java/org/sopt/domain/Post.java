@@ -1,37 +1,42 @@
 package org.sopt.domain;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
-public class Post {
-  private Long id;          // 게시글 상세 화면 — 특정 게시글 식별용
-  private String title;     // 목록, 상세, 글쓰기 화면 — 제목
-  private String content;   // 목록(미리보기), 상세(전체) 화면 — 내용
-  private String author;    // 목록, 상세 화면 — 글쓴이
+@Entity  // "이 클래스를 DB 테이블과 매핑해요" — 영속성 컨텍스트가 이 클래스를 관리해요
+public class Post extends BaseTimeEntity {
+
+  @Id // 앞에서 배운 PK
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  private String title;
+
+  private String content;
+
+  @ManyToOne(fetch = FetchType.LAZY)  // User : Post = 1 : N
+  @JoinColumn(name = "user_id")       // post 테이블에 user_id FK 컬럼이 생겨요
+  private User user;
+
   private boolean isQuestion;
   private boolean isAnonymous;
-  private String createdAt; // 목록, 상세 화면 — 작성 시각
   private BoardType boardType;
 
-  public Post(Long id, String title, String content, String author, boolean isAnonymous, boolean isQuestion, BoardType boardType) {
-    this.id = id;
+  protected Post() {}  // JPA 기본 생성자
+
+  public Post(String title, String content, User user, boolean isQuestion, boolean isAnonymous, BoardType boardType) {
     this.title = title;
     this.content = content;
-    this.author = author;
-    this.isAnonymous = isAnonymous;
+    this.user = user;
     this.isQuestion = isQuestion;
-    this.createdAt = LocalDateTime.now().toString();
+    this.isAnonymous = isAnonymous;
     this.boardType = boardType;
   }
-
-  public Long getId() { return id; }
-  public String getTitle() { return title; }
-  public String getContent() { return content; }
-  public String getAuthor() { return author; }
-  public boolean isQuestion() { return isQuestion; }
-  public boolean isAnonymous() { return isAnonymous; }
-  public String getCreatedAt() { return createdAt; }
-  public BoardType getBoardType() { return boardType; }
-
 
   public void update(String title, String content, boolean isQuestion, boolean isAnonymous) {
     this.title = title;
@@ -39,4 +44,29 @@ public class Post {
     this.isQuestion = isQuestion;
     this.isAnonymous = isAnonymous;
   }
+
+  public Long getId() {
+    return this.id;
+  }
+
+  public String getTitle() {
+    return this.title;
+  }
+
+  public String getContent() {
+    return this.content;
+  }
+
+  public BoardType getBoardType() {
+    return this.boardType;
+  }
+
+  public String getAuthor() { return this.user.getNickname(); }
+
+  public boolean isAnonymous() { return this.isAnonymous; }
+
+  public boolean isQuestion() { return this.isQuestion; }
+
+  public User getUser() { return this.user; }
+
 }

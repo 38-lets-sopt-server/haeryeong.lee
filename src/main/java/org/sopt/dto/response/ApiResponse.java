@@ -3,18 +3,12 @@ package org.sopt.dto.response;
 import org.sopt.global.code.BaseCode;
 import org.sopt.global.code.status.SuccessStatus;
 
-public class ApiResponse<T> {
-  private final boolean success;
-  private final String code;
-  private final String message;
-  private final T result;
-
-  public ApiResponse(boolean success, String code, String message, T result) {
-    this.success = success;
-    this.code = code;
-    this.message = message;
-    this.result = result;
-  }
+public record ApiResponse<T>(
+    boolean success,
+    String code,
+    String message,
+    T result
+) {
 
   public static <T> ApiResponse<T> onSuccess(T result) {
     return new ApiResponse<>(
@@ -41,29 +35,5 @@ public class ApiResponse<T> {
         code.getMessage(),
         result
     );
-  }
-
-  public boolean isSuccess() {
-    return success;
-  }
-
-  public String getCode() {
-    return code;
-  }
-
-  public String getMessage() {
-    return message;
-  }
-
-  public T getResult() {
-    return result;
-  }
-
-  @Override
-  public String toString() {
-    return "success=" + success +
-        "\ncode=" + code +
-        "\nmessage=" + message +
-        "\nresult=" + result;
   }
 }

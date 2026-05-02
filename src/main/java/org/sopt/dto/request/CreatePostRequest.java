@@ -1,30 +1,31 @@
 package org.sopt.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.sopt.domain.BoardType;
 
 // 게시글 작성 요청 (클라이언트 → 서버)
-public class CreatePostRequest {
-  private String title;
-  private String content;
-  private String author;
-  private boolean isQuestion;
-  private boolean isAnonymous;
-  private BoardType boardType;
+@Schema(description = "게시글 작성 요청")
+public record CreatePostRequest(
+  @Schema(description = "작성자 ID", example = "1")
+  Long userId,
 
-  public CreatePostRequest(String title, String content, String author, boolean isQuestion, boolean isAnonymous, BoardType boardType) {
-    this.title = title;
-    this.content = content;
-    this.author = author;
-    this.isQuestion = isQuestion;
-    this.isAnonymous = isAnonymous;
-    this.boardType = boardType;
-  }
+  @Schema(description = "게시글 제목", example = "오늘 학식 뭐임")
+  String title,
 
-  public String getTitle() { return title; }
-  public String getContent() { return content; }
-  public String getAuthor() { return author; }
-  public boolean isQuestion() { return isQuestion; }
-  public boolean isAnonymous() { return isAnonymous; }
-  public BoardType getBoardType() { return boardType; }
+  @Schema(description = "게시글 내용", example = "돈까스래")
+  String content,
+
+  @Schema(description = "작성자명", example = "익명")
+  String author,
+
+  @Schema(description = "질문 게시글 여부", example = "false")
+  boolean isQuestion,
+
+  @Schema(description = "익명 여부", example = "true")
+  boolean isAnonymous,
+
+  @Schema(description = "게시판 타입", example = "FREE")
+  BoardType boardType
+) {
 }
 
