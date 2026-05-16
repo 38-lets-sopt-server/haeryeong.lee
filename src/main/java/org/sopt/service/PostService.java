@@ -36,7 +36,7 @@ public class PostService {
     PostValidator.validatePostTitle(request.title());
 
     User user = userRepository.findById(request.userId())
-        .orElseThrow(PostNotFoundException::new);
+        .orElseThrow(() -> new GeneralException(ErrorCode.USER_NOT_FOUND));
 
     Post post = new Post(request.title(), request.content(), user, request.isQuestion(), request.isAnonymous(), request.boardType());
     postRepository.save(post);
