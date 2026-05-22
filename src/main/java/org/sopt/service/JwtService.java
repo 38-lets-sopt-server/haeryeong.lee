@@ -57,7 +57,7 @@ public class JwtService {
     }
   }
 
-  public LocalDateTime getExpiresAt(String token) {
+  public LocalDateTime getExpiration(String token) {
     DecodedJWT jwt = JWT.require(algorithm).build().verify(token);
     return jwt.getExpiresAt()
         .toInstant()
