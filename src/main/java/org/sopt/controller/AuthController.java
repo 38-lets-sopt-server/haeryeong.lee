@@ -36,7 +36,7 @@ public class AuthController {
   }
 
   @Operation(summary = "내 정보 조회 (Access Token 검증)")
-  @GetMapping("/api/v1/me")
+  @GetMapping("/me")
   public ResponseEntity<ApiResponse<UserResponse>> me(Authentication authentication) {
 
     if (authentication == null || authentication.getPrincipal() == null) {
