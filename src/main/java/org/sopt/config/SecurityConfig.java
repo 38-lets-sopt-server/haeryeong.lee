@@ -3,6 +3,7 @@ package org.sopt.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -24,7 +25,12 @@ public class SecurityConfig {
         .csrf(csrf -> csrf.disable())
         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/v1/login", "/v1/reissue").permitAll()
+            .requestMatchers("/api/v1/auth/login", "/api/v1/auth/reissue").permitAll()
+            .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
+            .requestMatchers(HttpMethod.POST, "/posts").authenticated()
+            .requestMatchers(HttpMethod.PUT, "/posts/**").authenticated()
+            .requestMatchers(HttpMethod.DELETE, "/posts/**").authenticated()
+            .requestMatchers(HttpMethod.PATCH, "/posts/*/likes").authenticated()
             .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
             .anyRequest().authenticated()
         )

@@ -18,6 +18,7 @@ import org.sopt.service.LikeService;
 import org.sopt.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -51,9 +52,12 @@ public class PostController {
       @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.")
   })
   public ResponseEntity<ApiResponse<CreatePostResponse>> createPost(
-      @RequestBody CreatePostRequest request
+      @RequestBody CreatePostRequest request,
+      Authentication authentication
   ) {
-    CreatePostResponse response = postService.createPost(request);
+    Long userId = Long.parseLong(authentication.getName());
+
+    CreatePostResponse response = postService.createPost(request, userId);
     return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.of(SuccessStatus.POST_CREATED, response));
   }
 
@@ -105,9 +109,12 @@ public class PostController {
   public ResponseEntity<ApiResponse<PostResponse>> updatePost(
       @Parameter(description = "수정할 게시글 ID", example = "1")
       @PathVariable Long id,
-      @RequestBody UpdatePostRequest request
+      @RequestBody UpdatePostRequest request,
+      Authentication authentication
   ) {
-    PostResponse response = postService.updatePost(id, request);
+    Long userId = Long.parseLong(authentication.getName());
+
+    PostResponse response = postService.updatePost(id, request, userId);
     return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.of(SuccessStatus.POST_UPDATED, response));
   }
 
@@ -121,9 +128,12 @@ public class PostController {
   })
   public ResponseEntity<ApiResponse<PostResponse>> deletePost(
       @Parameter(description = "삭제할 게시글 ID", example = "1")
-      @PathVariable Long id
+      @PathVariable Long id,
+      Authentication authentication
   ) {
-    PostResponse response = postService.deletePost(id);
+    Long userId = Long.parseLong(authentication.getName());
+
+    PostResponse response = postService.deletePost(id, userId);
     return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.of(SuccessStatus.POST_DELETED, response));
   }
 
@@ -137,8 +147,9 @@ public class PostController {
   public ResponseEntity<ApiResponse<LikeResponse>> toggleLike(
       @Parameter(description = "좋아요/취소할 게시글 ID", example = "1")
       @PathVariable Long postId,
-      @RequestParam Long userId
+      Authentication authentication
   ) {
+    Long userId = Long.parseLong(authentication.getName());
     LikeResponse response = likeService.toggleLike(postId, userId);
     SuccessStatus status = response.isLiked() ? SuccessStatus.LIKE_CREATED : SuccessStatus.LIKE_DELETED;
     return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.of(status, response));

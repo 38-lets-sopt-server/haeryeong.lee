@@ -4,8 +4,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.domain.RefreshToken;
 import org.sopt.domain.User;
+import org.sopt.dto.request.SignUpRequest;
 import org.sopt.dto.response.TokenResponse;
 import org.sopt.dto.response.UserResponse;
+import org.sopt.global.code.status.ErrorCode;
+import org.sopt.global.exception.GeneralException;
 import org.sopt.repository.RefreshTokenRepository;
 import org.sopt.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,9 +52,38 @@ public class AuthService {
     return TokenResponse.of(accessToken, refreshToken);
   }
 
+  @Transactional
+  public UserResponse signUp(SignUpRequest request) {
+    userRepository.findByEmail(request.email()).ifPresent(user -> {
+      throw new GeneralException(ErrorCode.EMAIL_ALREADY_EXISTS);
+    });
+
+    User user = new User(request.nickname(), request.email(), request.password());
+
+    return UserResponse.from(userRepository.save(user));
+  }
+
   public UserResponse getUserById(Long userId) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+        .orElseThrow(() -> new GeneralException(ErrorCode.USER_NOT_FOUND));
     return UserResponse.from(user);
+  }
+
+  @Transactional
+  public TokenResponse reissue(String refreshToken) {
+    RefreshToken savedToken = refreshTokenRepository.findByToken(refreshToken)
+        .orElseThrow(() -> new GeneralException(ErrorCode.INVALID_REFRESH_TOKEN));
+
+    Long userId = jwtService.verifyAndGetUserId(refreshToken);
+
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new GeneralException(ErrorCode.USER_NOT_FOUND));
+
+    String newAccessToken = jwtService.generateAccessToken(user.getId(), user.getEmail());
+    String newRefreshToken = jwtService.generateRefreshToken(user.getId());
+
+    savedToken.rotate(newRefreshToken, refreshTokenExpiresInSeconds);
+
+    return TokenResponse.of(newAccessToken, newRefreshToken);
   }
 }

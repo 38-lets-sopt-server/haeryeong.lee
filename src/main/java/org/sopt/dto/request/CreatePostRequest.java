@@ -6,8 +6,6 @@ import org.sopt.domain.BoardType;
 // 게시글 작성 요청 (클라이언트 → 서버)
 @Schema(description = "게시글 작성 요청")
 public record CreatePostRequest(
-  @Schema(description = "작성자 ID", example = "1")
-  Long userId,
 
   @Schema(description = "게시글 제목", example = "오늘 학식 뭐임")
   String title,

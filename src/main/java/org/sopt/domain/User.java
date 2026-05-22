@@ -22,9 +22,10 @@ public class User { //extends BaseTimeEntity {
 
   protected User() {}
 
-  public User(String nickname, String email) {
+  public User(String nickname, String email, String password) {
     this.nickname = nickname;
     this.email = email;
+    this.password = password;
   }
 
   public Long getId() {

@@ -17,8 +17,8 @@ public class JwtService {
 
   public JwtService(
       @Value("${security.jwt.secret}") String secret,
-      @Value("${security.jwt.access-token-expires-in-seconds:1800}") long accessTokenExpiresInSeconds,
-      @Value("${security.jwt.refresh-token-expires-in-seconds:1209600}") long refreshTokenExpiresInSeconds
+      @Value("${security.jwt.access-token-expiration:1800}") long accessTokenExpiresInSeconds,
+      @Value("${security.jwt.refresh-token-expiration:1209600}") long refreshTokenExpiresInSeconds
   ) {
     this.algorithm = Algorithm.HMAC256(secret);
     this.accessTokenExpiresInSeconds = accessTokenExpiresInSeconds;
