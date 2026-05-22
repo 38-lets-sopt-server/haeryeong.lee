@@ -15,7 +15,8 @@ public enum ErrorCode implements BaseCode {
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER4001", "사용자를 찾을 수 없습니다."),
   EMAIL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "USER4002", "이미 존재하는 이메일입니다."),
   INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "AUTH4001", "유효하지 않은 Refresh Token입니다."),
-  FORBIDDEN(HttpStatus.FORBIDDEN, "AUTH4002", "권한이 없습니다.");
+  FORBIDDEN(HttpStatus.FORBIDDEN, "AUTH4002", "권한이 없습니다."),
+  INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "AUTH4003", "잘못된 비밀번호입니다.");
 
   private final HttpStatus httpStatus;
   private final String code;

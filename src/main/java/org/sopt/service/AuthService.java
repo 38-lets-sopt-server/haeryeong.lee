@@ -12,6 +12,7 @@ import org.sopt.global.exception.GeneralException;
 import org.sopt.repository.RefreshTokenRepository;
 import org.sopt.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,16 +22,17 @@ public class AuthService {
   private final UserRepository userRepository;
   private final RefreshTokenRepository refreshTokenRepository;
   private final JwtService jwtService;
+  private final PasswordEncoder passwordEncoder;
 
   @Value("${security.jwt.refresh-token-expires-in-seconds:1209600}")
   private long refreshTokenExpiresInSeconds;
 
   public UserResponse loginWithCredentials(String email, String password) {
     User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+        .orElseThrow(() -> new GeneralException(ErrorCode.USER_NOT_FOUND));
 
-    if (!user.getPassword().equals(password)) {
-      throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
+    if (!passwordEncoder.matches(password, user.getPassword())) {
+      throw new GeneralException(ErrorCode.INVALID_PASSWORD);
     }
 
     return UserResponse.from(user);
@@ -58,7 +60,7 @@ public class AuthService {
       throw new GeneralException(ErrorCode.EMAIL_ALREADY_EXISTS);
     });
 
-    User user = new User(request.nickname(), request.email(), request.password());
+    User user = new User(request.nickname(), request.email(), passwordEncoder.encode(request.password()));
 
     return UserResponse.from(userRepository.save(user));
   }
