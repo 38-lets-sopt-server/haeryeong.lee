@@ -1,5 +1,7 @@
 package org.sopt.service;
 
+import java.util.Optional;
+import javax.swing.text.html.Option;
 import org.sopt.domain.Like;
 import org.sopt.domain.Post;
 import org.sopt.domain.User;
@@ -34,13 +36,15 @@ public class LikeService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new GeneralException(ErrorCode.USER_NOT_FOUND));
 
-    Like like = likeRepository.findByUserIdAndPostId(userId, postId)
-        .orElseGet(() -> likeRepository.save(Like.builder()
+    Optional<Like> existingLike = likeRepository.findByUserIdAndPostId(userId, postId);
+    Like like = existingLike.orElseGet(() -> likeRepository.save(
+        Like.builder()
             .user(user)
             .post(post)
-            .build()));
+            .build()
+    ));
 
-    if (like.getId() != null) {
+    if (existingLike.isPresent()) {
       like.toggle();
     }
 
