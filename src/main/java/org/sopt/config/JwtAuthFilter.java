@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
-import org.sopt.domain.BlacklistedAccessToken;
 import org.sopt.repository.BlacklistedAccessTokenRepository;
 import org.sopt.service.JwtService;
 import org.springframework.http.HttpHeaders;

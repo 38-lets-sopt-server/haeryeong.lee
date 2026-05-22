@@ -7,8 +7,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity  // "이 클래스를 DB 테이블과 매핑해요" — 영속성 컨텍스트가 이 클래스를 관리해요
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post extends BaseTimeEntity {
 
   @Id // 앞에서 배운 PK
@@ -27,9 +33,8 @@ public class Post extends BaseTimeEntity {
   private boolean isAnonymous;
   private BoardType boardType;
 
-  protected Post() {}  // JPA 기본 생성자
-
-  public Post(String title, String content, User user, boolean isQuestion, boolean isAnonymous, BoardType boardType) {
+  @Builder
+  private Post(String title, String content, User user, boolean isQuestion, boolean isAnonymous, BoardType boardType) {
     this.title = title;
     this.content = content;
     this.user = user;
@@ -45,28 +50,5 @@ public class Post extends BaseTimeEntity {
     this.isAnonymous = isAnonymous;
   }
 
-  public Long getId() {
-    return this.id;
-  }
-
-  public String getTitle() {
-    return this.title;
-  }
-
-  public String getContent() {
-    return this.content;
-  }
-
-  public BoardType getBoardType() {
-    return this.boardType;
-  }
-
   public String getAuthor() { return this.user.getNickname(); }
-
-  public boolean isAnonymous() { return this.isAnonymous; }
-
-  public boolean isQuestion() { return this.isQuestion; }
-
-  public User getUser() { return this.user; }
-
 }

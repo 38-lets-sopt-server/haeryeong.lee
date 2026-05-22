@@ -68,7 +68,11 @@ public class AuthService {
       throw new GeneralException(ErrorCode.EMAIL_ALREADY_EXISTS);
     });
 
-    User user = new User(request.nickname(), request.email(), passwordEncoder.encode(request.password()), null, null);
+    User user = User.builder()
+        .nickname(request.nickname())
+        .email(request.email())
+        .password(passwordEncoder.encode(request.password()))
+        .build();
 
     return UserResponse.from(userRepository.save(user));
   }
@@ -117,7 +121,12 @@ public class AuthService {
     String nickname = kakaoUser.properties().nickname();
 
     User user = userRepository.findByProviderAndProviderId(provider, providerId)
-        .orElseGet(() -> userRepository.save(new User(nickname, email, null, provider, providerId)));
+        .orElseGet(() -> userRepository.save(User.builder()
+            .nickname(nickname)
+            .email(email)
+            .provider(provider)
+            .providerId(providerId)
+            .build()));
 
     String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail());
     String refreshToken = jwtService.generateRefreshToken(user.getId());

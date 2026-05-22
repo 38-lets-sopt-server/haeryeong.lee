@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,6 +29,7 @@ public class BlacklistedAccessToken {
   @Column(nullable = false)
   private LocalDateTime expiresAt;
 
+  @Builder
   private BlacklistedAccessToken(String token, Long userId, LocalDateTime expiresAt) {
     this.token = token;
     this.userId = userId;
@@ -35,6 +37,10 @@ public class BlacklistedAccessToken {
   }
 
   public static BlacklistedAccessToken of(String token, Long userId, LocalDateTime expiresAt) {
-    return new BlacklistedAccessToken(token, userId, expiresAt);
+    return BlacklistedAccessToken.builder()
+        .token(token)
+        .userId(userId)
+        .expiresAt(expiresAt)
+        .build();
   }
 }

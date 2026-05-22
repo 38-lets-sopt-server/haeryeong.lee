@@ -35,7 +35,10 @@ public class LikeService {
         .orElseThrow(() -> new GeneralException(ErrorCode.USER_NOT_FOUND));
 
     Like like = likeRepository.findByUserIdAndPostId(userId, postId)
-        .orElseGet(() -> likeRepository.save(new Like(user, post)));
+        .orElseGet(() -> likeRepository.save(Like.builder()
+            .user(user)
+            .post(post)
+            .build()));
 
     if (like.getId() != null) {
       like.toggle();

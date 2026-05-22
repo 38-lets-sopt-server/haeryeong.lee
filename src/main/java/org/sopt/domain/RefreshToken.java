@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,6 +29,7 @@ public class RefreshToken {
   @Column(nullable = false)
   private LocalDateTime expiresAt;
 
+  @Builder
   private RefreshToken(Long userId, String token, LocalDateTime expiresAt) {
     this.userId = userId;
     this.token = token;
@@ -35,11 +37,11 @@ public class RefreshToken {
   }
 
   public static RefreshToken of(Long userId, String token, long expiresInSeconds) {
-    return new RefreshToken(
-        userId,
-        token,
-        LocalDateTime.now().plusSeconds(expiresInSeconds)
-    );
+    return RefreshToken.builder()
+        .userId(userId)
+        .token(token)
+        .expiresAt(LocalDateTime.now().plusSeconds(expiresInSeconds))
+        .build();
   }
 
   public void rotate(String newToken, long expiresInSeconds) {
