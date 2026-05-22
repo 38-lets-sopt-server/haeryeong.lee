@@ -13,6 +13,7 @@ public record SignUpRequest(
     String nickname,
 
     @Schema(description = "이메일", example = "seopseopt@sopt.com")
+    @NotBlank(message = "이메일은 필수입니다.")
     @Email(message = "이메일 형식이 올바르지 않습니다.")
     String email,
 
