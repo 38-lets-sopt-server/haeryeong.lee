@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -54,5 +55,13 @@ public class JwtService {
     } catch (NumberFormatException e) {
       throw new IllegalArgumentException("JWT의 회원 정보가 올바르지 않습니다.");
     }
+  }
+
+  public LocalDateTime getExpiresAt(String token) {
+    DecodedJWT jwt = JWT.require(algorithm).build().verify(token);
+    return jwt.getExpiresAt()
+        .toInstant()
+        .atZone(java.time.ZoneId.systemDefault())
+        .toLocalDateTime();
   }
 }

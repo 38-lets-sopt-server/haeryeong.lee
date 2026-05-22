@@ -1,7 +1,9 @@
 package org.sopt.service;
 
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.sopt.domain.BlacklistedAccessToken;
 import org.sopt.domain.RefreshToken;
 import org.sopt.domain.User;
 import org.sopt.dto.request.SignUpRequest;
@@ -9,6 +11,7 @@ import org.sopt.dto.response.TokenResponse;
 import org.sopt.dto.response.UserResponse;
 import org.sopt.global.code.status.ErrorCode;
 import org.sopt.global.exception.GeneralException;
+import org.sopt.repository.BlacklistedAccessTokenRepository;
 import org.sopt.repository.RefreshTokenRepository;
 import org.sopt.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +26,7 @@ public class AuthService {
   private final RefreshTokenRepository refreshTokenRepository;
   private final JwtService jwtService;
   private final PasswordEncoder passwordEncoder;
+  private final BlacklistedAccessTokenRepository blacklistedAccessTokenRepository;
 
   @Value("${security.jwt.refresh-token-expires-in-seconds:1209600}")
   private long refreshTokenExpiresInSeconds;
@@ -87,5 +91,14 @@ public class AuthService {
     savedToken.rotate(newRefreshToken, refreshTokenExpiresInSeconds);
 
     return TokenResponse.of(newAccessToken, newRefreshToken);
+  }
+
+  @Transactional
+  public void logout(Long userId, String accessToken) {
+    refreshTokenRepository.deleteByUserId(userId);
+
+    LocalDateTime expiresAt = jwtService.getExpiration(accessToken);
+
+    blacklistedAccessTokenRepository.save(BlacklistedAccessToken.of(accessToken, userId, expiresAt));
   }
 }

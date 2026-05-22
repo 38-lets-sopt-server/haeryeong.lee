@@ -7,12 +7,14 @@ import org.sopt.dto.response.ApiResponse;
 import org.sopt.dto.response.TokenResponse;
 import org.sopt.dto.response.UserResponse;
 import org.sopt.service.AuthService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -65,5 +67,17 @@ public class AuthController {
   ) {
     TokenResponse tokens = authService.reissue(refreshToken);
     return ResponseEntity.ok(ApiResponse.onSuccess(tokens));
+  }
+
+  @Operation(summary = "로그아웃 (Access Token 블랙리스트 등록)")
+  @PostMapping("/logout")
+  public ResponseEntity<ApiResponse<Void>> logout(
+      Authentication authentication,
+      @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader
+  ) {
+    Long userId = Long.parseLong(authentication.getName());
+    String accessToken = authorizationHeader.substring("Bearer ".length()).trim();
+    authService.logout(userId, accessToken);
+    return ResponseEntity.ok(ApiResponse.onSuccess(null));
   }
 }
