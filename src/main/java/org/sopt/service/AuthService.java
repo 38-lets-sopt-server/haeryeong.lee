@@ -39,6 +39,10 @@ public class AuthService {
     User user = userRepository.findByEmail(email)
         .orElseThrow(() -> new GeneralException(ErrorCode.USER_NOT_FOUND));
 
+    if (user.getProvider() != null) {
+      throw new GeneralException(ErrorCode.SOCIAL_LOGIN_USER);
+    }
+
     if (!passwordEncoder.matches(password, user.getPassword())) {
       throw new GeneralException(ErrorCode.INVALID_PASSWORD);
     }

@@ -16,7 +16,8 @@ public enum ErrorCode implements BaseCode {
   EMAIL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "USER4002", "이미 존재하는 이메일입니다."),
   INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "AUTH4001", "유효하지 않은 Refresh Token입니다."),
   FORBIDDEN(HttpStatus.FORBIDDEN, "AUTH4002", "권한이 없습니다."),
-  INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "AUTH4003", "잘못된 비밀번호입니다.");
+  INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "AUTH4003", "잘못된 비밀번호입니다."),
+  SOCIAL_LOGIN_USER(HttpStatus.BAD_REQUEST, "AUTH4004", "소셜 로그인으로 가입된 계정입니다.");
 
   private final HttpStatus httpStatus;
   private final String code;
