@@ -18,6 +18,8 @@ public class User { //extends BaseTimeEntity {
 
   private String email;
 
+  private String password;
+
   protected User() {}
 
   public User(String nickname, String email) {
@@ -36,4 +38,6 @@ public class User { //extends BaseTimeEntity {
   public String getEmail() {
     return this.email;
   }
+
+  public String getPassword() { return this.password; }
 }
