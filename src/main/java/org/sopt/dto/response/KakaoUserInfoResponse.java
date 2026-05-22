@@ -1,7 +1,6 @@
 package org.sopt.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Properties;
 
 public record KakaoUserInfoResponse(
     Long id,

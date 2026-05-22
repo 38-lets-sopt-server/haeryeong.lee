@@ -75,7 +75,7 @@ public class PostService {
     if (start >= totalElements) {
       postResponses = List.of();
     } else {
-      postResponses = posts.subList(start, end).stream().map(PostResponse::new).toList();
+      postResponses = posts.subList(start, end).stream().map(PostResponse::from).toList();
     }
 
     return new PostListResponse(postResponses, postResponses.size(), totalPages, totalElements, page == 0, page >= totalPages - 1);
@@ -86,7 +86,7 @@ public class PostService {
     PostValidator.validatePostId(id);
     Post post = postRepository.findById(id)
         .orElseThrow(PostNotFoundException::new);
-    return new PostResponse(post);
+    return PostResponse.from(post);
   }
 
   @Transactional  // 변경 → 더티 체킹으로 save() 없이 자동 UPDATE
@@ -101,7 +101,7 @@ public class PostService {
     }
 
     post.update(request.title(), request.content(), request.isQuestion(), request.isAnonymous()); // save() 호출 없어도 트랜잭션 커밋 시 UPDATE 쿼리 자동 실행
-    return new PostResponse(post);
+    return PostResponse.from(post);
   }
 
   // DELETE 📝 과제
@@ -114,7 +114,7 @@ public class PostService {
       throw new GeneralException(ErrorCode.FORBIDDEN);
     }
 
-    PostResponse response = new PostResponse(post);
+    PostResponse response = PostResponse.from(post);
     postRepository.delete(post);
     return response;
   }

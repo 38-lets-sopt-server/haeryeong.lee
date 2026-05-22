@@ -1,6 +1,7 @@
 package org.sopt.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.sopt.dto.request.SignUpRequest;
 import org.sopt.dto.response.ApiResponse;
@@ -54,7 +55,7 @@ public class AuthController {
   @Operation(summary = "회원가입")
   @PostMapping("/signup")
   public ResponseEntity<ApiResponse<UserResponse>> signUp(
-      @RequestBody SignUpRequest request
+      @Valid @RequestBody SignUpRequest request
   ) {
     UserResponse user = authService.signUp(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.onSuccess(user));

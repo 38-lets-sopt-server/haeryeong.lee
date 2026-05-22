@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.sopt.domain.BoardType;
 import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.request.UpdatePostRequest;
@@ -51,7 +52,7 @@ public class PostController {
       @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.")
   })
   public ResponseEntity<ApiResponse<CreatePostResponse>> createPost(
-      @RequestBody CreatePostRequest request,
+      @Valid @RequestBody CreatePostRequest request,
       Authentication authentication
   ) {
     Long userId = Long.parseLong(authentication.getName());
@@ -108,7 +109,7 @@ public class PostController {
   public ResponseEntity<ApiResponse<PostResponse>> updatePost(
       @Parameter(description = "수정할 게시글 ID", example = "1")
       @PathVariable Long id,
-      @RequestBody UpdatePostRequest request,
+      @Valid @RequestBody UpdatePostRequest request,
       Authentication authentication
   ) {
     Long userId = Long.parseLong(authentication.getName());
