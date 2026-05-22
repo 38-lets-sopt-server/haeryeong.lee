@@ -14,3 +14,8 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-expiration: 1800 # 30 minutes
+    refresh-token-expiration: 1209600 # 14 days
