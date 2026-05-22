@@ -20,12 +20,18 @@ public class User { //extends BaseTimeEntity {
 
   private String password;
 
+  private String provider;
+
+  private String providerId;
+
   protected User() {}
 
-  public User(String nickname, String email, String password) {
+  public User(String nickname, String email, String password, String provider, String providerId) {
     this.nickname = nickname;
     this.email = email;
     this.password = password;
+    this.provider = provider;
+    this.providerId = providerId;
   }
 
   public Long getId() {

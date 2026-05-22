@@ -3,10 +3,13 @@ package org.sopt.service;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.sopt.config.KakaoClient;
 import org.sopt.domain.BlacklistedAccessToken;
 import org.sopt.domain.RefreshToken;
 import org.sopt.domain.User;
 import org.sopt.dto.request.SignUpRequest;
+import org.sopt.dto.response.KakaoTokenResponse;
+import org.sopt.dto.response.KakaoUserInfoResponse;
 import org.sopt.dto.response.TokenResponse;
 import org.sopt.dto.response.UserResponse;
 import org.sopt.global.code.status.ErrorCode;
@@ -27,6 +30,7 @@ public class AuthService {
   private final JwtService jwtService;
   private final PasswordEncoder passwordEncoder;
   private final BlacklistedAccessTokenRepository blacklistedAccessTokenRepository;
+  private final KakaoClient kakaoClient;
 
   @Value("${security.jwt.refresh-token-expires-in-seconds:1209600}")
   private long refreshTokenExpiresInSeconds;
@@ -64,7 +68,7 @@ public class AuthService {
       throw new GeneralException(ErrorCode.EMAIL_ALREADY_EXISTS);
     });
 
-    User user = new User(request.nickname(), request.email(), passwordEncoder.encode(request.password()));
+    User user = new User(request.nickname(), request.email(), passwordEncoder.encode(request.password()), null, null);
 
     return UserResponse.from(userRepository.save(user));
   }
@@ -100,5 +104,29 @@ public class AuthService {
     LocalDateTime expiresAt = jwtService.getExpiration(accessToken);
 
     blacklistedAccessTokenRepository.save(BlacklistedAccessToken.of(accessToken, userId, expiresAt));
+  }
+
+  @Transactional
+  public TokenResponse kakaoLogin(String code) {
+    KakaoTokenResponse kakaoToken = kakaoClient.getToken(code);
+    KakaoUserInfoResponse kakaoUser = kakaoClient.getUserInfo(kakaoToken.accessToken());
+
+    String provider = "KAKAO";
+    String providerId = String.valueOf(kakaoUser.id());
+    String email = kakaoUser.kakaoAccount().email();
+    String nickname = kakaoUser.properties().nickname();
+
+    User user = userRepository.findByProviderAndProviderId(provider, providerId)
+        .orElseGet(() -> userRepository.save(new User(nickname, email, null, provider, providerId)));
+
+    String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail());
+    String refreshToken = jwtService.generateRefreshToken(user.getId());
+
+    refreshTokenRepository.deleteByUserId(user.getId());
+    refreshTokenRepository.save(
+        RefreshToken.of(user.getId(), refreshToken, refreshTokenExpiresInSeconds)
+    );
+
+    return TokenResponse.of(accessToken, refreshToken);
   }
 }

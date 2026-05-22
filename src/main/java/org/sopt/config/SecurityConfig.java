@@ -27,7 +27,7 @@ public class SecurityConfig {
         .csrf(csrf -> csrf.disable())
         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/v1/auth/login", "/api/v1/auth/reissue", "/api/v1/auth/signup").permitAll()
+            .requestMatchers("/api/v1/auth/login", "/api/v1/auth/reissue", "/api/v1/auth/signup", "/api/v1/auth/kakao/callback").permitAll()
             .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/posts").authenticated()
             .requestMatchers(HttpMethod.PUT, "/posts/**").authenticated()

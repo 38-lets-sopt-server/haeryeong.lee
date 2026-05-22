@@ -80,4 +80,13 @@ public class AuthController {
     authService.logout(userId, accessToken);
     return ResponseEntity.ok(ApiResponse.onSuccess(null));
   }
+
+  @Operation(summary = "카카오 로그인 콜백", description = "카카오 로그인 후 리다이렉트되는 콜백 엔드포인트입니다. 카카오에서 전달된 인가 코드를 받아 로그인 처리를 합니다.")
+  @GetMapping("/kakao/callback")
+  public ResponseEntity<ApiResponse<TokenResponse>> kakaoCallback(
+      @RequestParam("code") String code
+  ) {
+    TokenResponse tokens = authService.kakaoLogin(code);
+    return ResponseEntity.ok(ApiResponse.onSuccess(tokens));
+  }
 }
