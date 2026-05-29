@@ -14,38 +14,33 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RefreshToken {
+public class BlacklistedAccessToken {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(nullable = false, unique = true, length = 1000)
+  private String token;
+
   @Column(nullable = false)
   private Long userId;
-
-  @Column(nullable = false, unique = true)
-  private String token;
 
   @Column(nullable = false)
   private LocalDateTime expiresAt;
 
   @Builder
-  private RefreshToken(Long userId, String token, LocalDateTime expiresAt) {
-    this.userId = userId;
+  private BlacklistedAccessToken(String token, Long userId, LocalDateTime expiresAt) {
     this.token = token;
+    this.userId = userId;
     this.expiresAt = expiresAt;
   }
 
-  public static RefreshToken of(Long userId, String token, long expiresInSeconds) {
-    return RefreshToken.builder()
-        .userId(userId)
+  public static BlacklistedAccessToken of(String token, Long userId, LocalDateTime expiresAt) {
+    return BlacklistedAccessToken.builder()
         .token(token)
-        .expiresAt(LocalDateTime.now().plusSeconds(expiresInSeconds))
+        .userId(userId)
+        .expiresAt(expiresAt)
         .build();
-  }
-
-  public void rotate(String newToken, long expiresInSeconds) {
-    this.token = newToken;
-    this.expiresAt = LocalDateTime.now().plusSeconds(expiresInSeconds);
   }
 }

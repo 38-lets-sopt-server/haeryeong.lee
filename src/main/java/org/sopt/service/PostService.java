@@ -32,13 +32,20 @@ public class PostService {
   }
 
   @Transactional  // 저장 → DB 변경 발생 → 트랜잭션 커밋 시 반영
-  public CreatePostResponse createPost(CreatePostRequest request) {
+  public CreatePostResponse createPost(CreatePostRequest request, Long userId) {
     PostValidator.validatePostTitle(request.title());
 
-    User user = userRepository.findById(request.userId())
+    User user = userRepository.findById(userId)
         .orElseThrow(() -> new GeneralException(ErrorCode.USER_NOT_FOUND));
 
-    Post post = new Post(request.title(), request.content(), user, request.isQuestion(), request.isAnonymous(), request.boardType());
+    Post post = Post.builder()
+        .title(request.title())
+        .content(request.content())
+        .user(user)
+        .isQuestion(request.isQuestion())
+        .isAnonymous(request.isAnonymous())
+        .boardType(request.boardType())
+        .build();
     postRepository.save(post);
     return new CreatePostResponse(post.getId(), "게시글 등록 완료!");
   }
@@ -68,7 +75,7 @@ public class PostService {
     if (start >= totalElements) {
       postResponses = List.of();
     } else {
-      postResponses = posts.subList(start, end).stream().map(PostResponse::new).toList();
+      postResponses = posts.subList(start, end).stream().map(PostResponse::from).toList();
     }
 
     return new PostListResponse(postResponses, postResponses.size(), totalPages, totalElements, page == 0, page >= totalPages - 1);
@@ -79,26 +86,35 @@ public class PostService {
     PostValidator.validatePostId(id);
     Post post = postRepository.findById(id)
         .orElseThrow(PostNotFoundException::new);
-    return new PostResponse(post);
+    return PostResponse.from(post);
   }
 
   @Transactional  // 변경 → 더티 체킹으로 save() 없이 자동 UPDATE
-  public PostResponse updatePost(Long id, UpdatePostRequest request) {
+  public PostResponse updatePost(Long id, UpdatePostRequest request, Long userId) {
     PostValidator.validatePostTitle(request.title());
 
     Post post = postRepository.findById(id)
         .orElseThrow(PostNotFoundException::new);
 
+    if (!post.getUser().getId().equals(userId)) {
+      throw new GeneralException(ErrorCode.FORBIDDEN);
+    }
+
     post.update(request.title(), request.content(), request.isQuestion(), request.isAnonymous()); // save() 호출 없어도 트랜잭션 커밋 시 UPDATE 쿼리 자동 실행
-    return new PostResponse(post);
+    return PostResponse.from(post);
   }
 
   // DELETE 📝 과제
   @Transactional
-  public PostResponse deletePost(Long id) {
+  public PostResponse deletePost(Long id, Long userId) {
     Post post = postRepository.findById(id)
         .orElseThrow(PostNotFoundException::new);
-    PostResponse response = new PostResponse(post);
+
+    if (!post.getUser().getId().equals(userId)) {
+      throw new GeneralException(ErrorCode.FORBIDDEN);
+    }
+
+    PostResponse response = PostResponse.from(post);
     postRepository.delete(post);
     return response;
   }

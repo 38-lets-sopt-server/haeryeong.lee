@@ -1,15 +1,21 @@
 package org.sopt.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.sopt.dto.request.SignUpRequest;
 import org.sopt.dto.response.ApiResponse;
 import org.sopt.dto.response.TokenResponse;
 import org.sopt.dto.response.UserResponse;
 import org.sopt.service.AuthService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +39,7 @@ public class AuthController {
   }
 
   @Operation(summary = "내 정보 조회 (Access Token 검증)")
-  @GetMapping("/api/v1/me")
+  @GetMapping("/me")
   public ResponseEntity<ApiResponse<UserResponse>> me(Authentication authentication) {
 
     if (authentication == null || authentication.getPrincipal() == null) {
@@ -44,5 +50,44 @@ public class AuthController {
     UserResponse user = authService.getUserById(userId);
 
     return ResponseEntity.ok(ApiResponse.onSuccess(user));
+  }
+
+  @Operation(summary = "회원가입")
+  @PostMapping("/signup")
+  public ResponseEntity<ApiResponse<UserResponse>> signUp(
+      @Valid @RequestBody SignUpRequest request
+  ) {
+    UserResponse user = authService.signUp(request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.onSuccess(user));
+  }
+
+  @Operation(summary = "Access Token 재발급")
+  @PostMapping("/reissue")
+  public ResponseEntity<ApiResponse<TokenResponse>> reissue(
+      @RequestParam("refreshToken") String refreshToken
+  ) {
+    TokenResponse tokens = authService.reissue(refreshToken);
+    return ResponseEntity.ok(ApiResponse.onSuccess(tokens));
+  }
+
+  @Operation(summary = "로그아웃 (Access Token 블랙리스트 등록)")
+  @PostMapping("/logout")
+  public ResponseEntity<ApiResponse<Void>> logout(
+      Authentication authentication,
+      @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader
+  ) {
+    Long userId = Long.parseLong(authentication.getName());
+    String accessToken = authorizationHeader.substring("Bearer ".length()).trim();
+    authService.logout(userId, accessToken);
+    return ResponseEntity.ok(ApiResponse.onSuccess(null));
+  }
+
+  @Operation(summary = "카카오 로그인 콜백", description = "카카오 로그인 후 리다이렉트되는 콜백 엔드포인트입니다. 카카오에서 전달된 인가 코드를 받아 로그인 처리를 합니다.")
+  @GetMapping("/kakao/callback")
+  public ResponseEntity<ApiResponse<TokenResponse>> kakaoCallback(
+      @RequestParam("code") String code
+  ) {
+    TokenResponse tokens = authService.kakaoLogin(code);
+    return ResponseEntity.ok(ApiResponse.onSuccess(tokens));
   }
 }

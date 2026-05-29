@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
+import org.sopt.repository.BlacklistedAccessTokenRepository;
 import org.sopt.service.JwtService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +22,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
+  private final BlacklistedAccessTokenRepository blacklistedAccessTokenRepository;
 
   @Override
   protected void doFilterInternal(
@@ -32,6 +34,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     if (header != null && header.startsWith("Bearer ")) {
       String token = header.substring("Bearer ".length()).trim();
       try {
+        if (blacklistedAccessTokenRepository.existsByToken(token)) {
+          response.setStatus((HttpServletResponse.SC_UNAUTHORIZED));
+          return;
+        }
+
         Long userId = jwtService.verifyAndGetUserId(token);
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
             String.valueOf(userId), null, Collections.emptyList());

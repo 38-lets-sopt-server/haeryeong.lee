@@ -8,8 +8,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "likes")
 public class Like extends BaseTimeEntity {
 
@@ -27,9 +33,8 @@ public class Like extends BaseTimeEntity {
 
   private boolean isLiked;
 
-  protected Like() {}
-
-  public Like(User user, Post post) {
+  @Builder
+  private Like(User user, Post post) {
     this.user = user;
     this.post = post;
     this.isLiked = true;
@@ -37,21 +42,5 @@ public class Like extends BaseTimeEntity {
 
   public void toggle() {
     this.isLiked = !this.isLiked;
-  }
-
-  public boolean isLiked() {
-    return isLiked;
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public User getUser() {
-    return user;
-  }
-
-  public Post getPost() {
-    return post;
   }
 }

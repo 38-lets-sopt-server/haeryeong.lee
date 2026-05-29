@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,8 @@ public class JwtService {
 
   public JwtService(
       @Value("${security.jwt.secret}") String secret,
-      @Value("${security.jwt.access-token-expires-in-seconds:1800}") long accessTokenExpiresInSeconds,
-      @Value("${security.jwt.refresh-token-expires-in-seconds:1209600}") long refreshTokenExpiresInSeconds
+      @Value("${security.jwt.access-token-expiration:1800}") long accessTokenExpiresInSeconds,
+      @Value("${security.jwt.refresh-token-expiration:1209600}") long refreshTokenExpiresInSeconds
   ) {
     this.algorithm = Algorithm.HMAC256(secret);
     this.accessTokenExpiresInSeconds = accessTokenExpiresInSeconds;
@@ -54,5 +55,13 @@ public class JwtService {
     } catch (NumberFormatException e) {
       throw new IllegalArgumentException("JWT의 회원 정보가 올바르지 않습니다.");
     }
+  }
+
+  public LocalDateTime getExpiration(String token) {
+    DecodedJWT jwt = JWT.require(algorithm).build().verify(token);
+    return jwt.getExpiresAt()
+        .toInstant()
+        .atZone(java.time.ZoneId.systemDefault())
+        .toLocalDateTime();
   }
 }

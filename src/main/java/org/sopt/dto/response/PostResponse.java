@@ -14,12 +14,12 @@ public record PostResponse(
   BoardType boardType
 ) {
 
-  public PostResponse(Post post) {
-    this(
+  public static PostResponse from(Post post) {
+    return new PostResponse(
       post.getId(),
       post.getTitle(),
       post.getContent(),
-      post.getAuthor(),
+      post.isAnonymous() ? "익명" : post.getAuthor(),
       post.getCreatedAt().toString(),
       post.isAnonymous(),
       post.isQuestion(),
